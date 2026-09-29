@@ -1,9 +1,10 @@
 services:
   - type: web
     name: freshers-2026-portal
-    env: static
-    buildCommand: ""
-    staticPublishPath: ./
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
     routes:
       - type: rewrite
         source: /*

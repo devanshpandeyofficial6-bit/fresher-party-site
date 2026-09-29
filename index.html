@@ -32,6 +32,10 @@
   <script src="https://unpkg.com/@babel/standalone@7.24.0/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <!-- Firebase App & Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
   <style>
     :root {
       box-sizing: border-box;
@@ -183,7 +187,7 @@
 
   <!-- Main React App (Using Babel JSX) -->
   <script type="text/babel">
-    const { useState, useEffect, useRef, useLayoutEffect } = React;
+    const { useState, useEffect, useRef, useLayoutEffect, useCallback } = React;
 
     const ADMIN_EMAIL = "devanshpandeyofficial6@gmail.com";
     const ADMIN_PASS = "iamdumb@123";
@@ -220,19 +224,12 @@
 
     // Seed Committee Members Data
     const DEFAULT_MEMBERS = [
-      // Technical Department
       { id: "m1", department: "Technical Department", role: "Member", name: "Kunal Sachan", rollNo: "2500461520081" },
       { id: "m2", department: "Technical Department", role: "Member", name: "Anshu Yadav", rollNo: "2500461520031" },
-      
-      // Video & Photography Department
       { id: "m3", department: "Video & Photography Department", role: "Member", name: "Ayush Pal", rollNo: "2500460120007" },
       { id: "m4", department: "Video & Photography Department", role: "Member", name: "Parth Gupta", rollNo: "NOT FOUND" },
       { id: "m5", department: "Video & Photography Department", role: "Member", name: "Anand Kumar", rollNo: "2500461520024" },
-      
-      // Sound Department
       { id: "m6", department: "Sound Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "NOT FOUND" },
-      
-      // Management & Hospitality Department
       { id: "m7", department: "Management & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
       { id: "m8", department: "Management & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
       { id: "m9", department: "Management & Hospitality Department", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
@@ -243,26 +240,18 @@
       { id: "m14", department: "Management & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
       { id: "m15", department: "Management & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
       { id: "m16", department: "Management & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
-      
-      // Anchors
       { id: "m17", department: "Anchors", role: "Anchor", name: "Devansh Pandey", rollNo: "2500461520057" },
       { id: "m18", department: "Anchors", role: "Anchor", name: "Riya Jain", rollNo: "2500460100148" },
       { id: "m19", department: "Anchors", role: "Anchor", name: "Rudraksha Sharma", rollNo: "2500460100154" },
       { id: "m20", department: "Anchors", role: "Anchor", name: "Yashi Srivastava", rollNo: "2500460100208" },
-      
-      // Rampwalk
       { id: "m21", department: "Rampwalk", role: "Lead / Anchor", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
       { id: "m22", department: "Rampwalk", role: "Lead / Anchor", name: "Aakriti Srivastava", rollNo: "2500461520001" },
       { id: "m23", department: "Rampwalk", role: "Lead / Anchor", name: "Shivanand Pal", rollNo: "2500461520147" },
       { id: "m24", department: "Rampwalk", role: "Anchor", name: "Anvesha Chaudhary", rollNo: "2500461520036" },
-      
-      // Fillers
       { id: "m25", department: "Fillers", role: "Filler", name: "Rohit Kumar", rollNo: "2500460100151" },
       { id: "m26", department: "Fillers", role: "Filler", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
       { id: "m27", department: "Fillers", role: "Filler", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
       { id: "m28", department: "Fillers", role: "Filler", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
-      
-      // Art & Craft
       { id: "m29", department: "Art & Craft", role: "Lead / Member", name: "Riya Jain", rollNo: "2500460100148" },
       { id: "m30", department: "Art & Craft", role: "Lead / Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
       { id: "m31", department: "Art & Craft", role: "Member", name: "Lavanya Verma", rollNo: "250046010101" },
@@ -335,9 +324,28 @@
       ]
     };
 
+    // Helper: Detect Device Info for Dashboard Tracking
+    function getDeviceInfo() {
+      const ua = navigator.userAgent;
+      let os = "Desktop";
+      if (/Android/i.test(ua)) os = "Android 📱";
+      else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS 📱";
+      else if (/Mac/i.test(ua)) os = "macOS 💻";
+      else if (/Windows/i.test(ua)) os = "Windows 💻";
+      else if (/Linux/i.test(ua)) os = "Linux 💻";
+
+      let browser = "Browser";
+      if (/Chrome/i.test(ua) && !/Edge|Edg/i.test(ua)) browser = "Chrome";
+      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
+      else if (/Firefox/i.test(ua)) browser = "Firefox";
+      else if (/Edge|Edg/i.test(ua)) browser = "Edge";
+
+      return `${os} (${browser})`;
+    }
+
     function triggerConfetti() {
       if (typeof confetti === 'function') {
-        confetti({ particleCount: 80, spread: 85, origin: { y: 0.6 } });
+        confetti({ particleCount: 90, spread: 90, origin: { y: 0.6 } });
       }
     }
 
@@ -374,17 +382,17 @@
       // Data State
       const [data, setData] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_party_data_v8");
+          const saved = localStorage.getItem("fresher_party_data_v9");
           return saved ? JSON.parse(saved) : DEFAULT_DATA;
         } catch (e) {
           return DEFAULT_DATA;
         }
       });
 
-      // Committee Members State (Department-wise)
+      // Committee Members State
       const [members, setMembers] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_committee_members_v2");
+          const saved = localStorage.getItem("fresher_committee_members_v3");
           return saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
         } catch (e) {
           return DEFAULT_MEMBERS;
@@ -395,7 +403,7 @@
       const [users, setUsers] = useState(() => {
         let list = [];
         try {
-          list = JSON.parse(localStorage.getItem("fresher_party_users") || "[]");
+          list = JSON.parse(localStorage.getItem("fresher_party_users_v2") || "[]");
         } catch (e) { list = []; }
 
         const adminFound = list.find(u => u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
@@ -407,15 +415,17 @@
             name: "Devansh Pandey",
             role: "admin",
             canEdit: true,
-            registeredAt: new Date().toISOString()
+            registeredAt: new Date().toISOString(),
+            lastLoginAt: new Date().toISOString(),
+            device: getDeviceInfo()
           };
           list.unshift(adminUser);
-          localStorage.setItem("fresher_party_users", JSON.stringify(list));
+          localStorage.setItem("fresher_party_users_v2", JSON.stringify(list));
         } else {
           adminFound.password = ADMIN_PASS;
           adminFound.canEdit = true;
           adminFound.role = "admin";
-          localStorage.setItem("fresher_party_users", JSON.stringify(list));
+          localStorage.setItem("fresher_party_users_v2", JSON.stringify(list));
         }
         return list;
       });
@@ -428,6 +438,15 @@
         } catch (e) {
           return null;
         }
+      });
+
+      // Cloud Sync & Backend Engine State
+      const [cloudStatus, setCloudStatus] = useState("checking"); // 'connected' | 'server' | 'local' | 'checking'
+      const [lastSyncTime, setLastSyncTime] = useState(null);
+      const [isSyncing, setIsSyncing] = useState(false);
+      const [cloudConfigModal, setCloudConfigModal] = useState(false);
+      const [firebaseUrl, setFirebaseUrl] = useState(() => {
+        return localStorage.getItem("fresher_firebase_url") || "";
       });
 
       // UI States
@@ -472,27 +491,183 @@
 
       const notify = (msg) => {
         setToastMsg(msg);
-        setTimeout(() => setToastMsg(""), 4000);
+        setTimeout(() => setToastMsg(""), 4500);
       };
 
-      const updateData = (updater, logMsg) => {
-        setData(prev => {
-          const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
-          localStorage.setItem("fresher_party_data_v8", JSON.stringify(next));
-          return next;
-        });
-        if (logMsg) notify(logMsg);
+      // =========================================================================
+      // CLOUD SYNC ENGINE: MULTI-DEVICE SYNCHRONIZATION
+      // =========================================================================
+      
+      // Sync State to Cloud / Server / Local
+      const syncWithCloud = useCallback(async (forced = false) => {
+        if (isSyncing && !forced) return;
+        setIsSyncing(true);
+
+        // Tier 1: Try Local / Hosted Node Server REST API
+        try {
+          const res = await fetch("/api/sync", { cache: "no-store" });
+          if (res.ok) {
+            const remote = await res.json();
+            if (remote.users && Array.isArray(remote.users)) {
+              setUsers(prev => {
+                const map = new Map();
+                prev.forEach(u => map.set(u.email.toLowerCase(), u));
+                remote.users.forEach(u => {
+                  const existing = map.get(u.email.toLowerCase()) || {};
+                  map.set(u.email.toLowerCase(), { ...existing, ...u });
+                });
+                const merged = Array.from(map.values());
+                localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                return merged;
+              });
+            }
+            if (remote.itinerary) {
+              setData(remote.itinerary);
+              localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+            }
+            if (remote.members) {
+              setMembers(remote.members);
+              localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
+            }
+            setCloudStatus("server");
+            setLastSyncTime(new Date());
+            setIsSyncing(false);
+            return;
+          }
+        } catch (e) {
+          // Server endpoint not available; fall through to Firebase
+        }
+
+        // Tier 2: Try Firebase Realtime Database
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        if (customUrl && typeof firebase !== "undefined") {
+          try {
+            const cleanUrl = customUrl.replace(/\/$/, "");
+            const res = await fetch(`${cleanUrl}/portal_state.json`);
+            if (res.ok) {
+              const remote = await res.json();
+              if (remote) {
+                if (remote.users) {
+                  const userList = Object.values(remote.users);
+                  setUsers(prev => {
+                    const map = new Map();
+                    prev.forEach(u => map.set(u.email.toLowerCase(), u));
+                    userList.forEach(u => {
+                      const existing = map.get(u.email.toLowerCase()) || {};
+                      map.set(u.email.toLowerCase(), { ...existing, ...u });
+                    });
+                    const merged = Array.from(map.values());
+                    localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                    return merged;
+                  });
+                }
+                if (remote.itinerary) {
+                  setData(remote.itinerary);
+                  localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+                }
+                if (remote.members) {
+                  setMembers(remote.members);
+                  localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
+                }
+              }
+              setCloudStatus("connected");
+              setLastSyncTime(new Date());
+              setIsSyncing(false);
+              return;
+            }
+          } catch (err) {
+            console.warn("Firebase sync fetch error:", err);
+          }
+        }
+
+        // Tier 3: Local Storage mode
+        setCloudStatus("local");
+        setLastSyncTime(new Date());
+        setIsSyncing(false);
+      }, [firebaseUrl, isSyncing]);
+
+      // Push a registered/updated user to cloud backend
+      const pushUserToCloud = async (userObj) => {
+        // Try server
+        try {
+          const res = await fetch("/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userObj)
+          });
+          if (res.ok) return true;
+        } catch (e) {}
+
+        // Try Firebase
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        if (customUrl) {
+          try {
+            const cleanUrl = customUrl.replace(/\/$/, "");
+            const key = userObj.email.replace(/[^a-zA-Z0-9]/g, "_");
+            await fetch(`${cleanUrl}/portal_state/users/${key}.json`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(userObj)
+            });
+            return true;
+          } catch (e) {}
+        }
+        return false;
       };
 
-      const updateMembers = (updater, logMsg) => {
-        setMembers(prev => {
-          const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
-          localStorage.setItem("fresher_committee_members_v2", JSON.stringify(next));
-          return next;
-        });
-        if (logMsg) notify(logMsg);
+      // Push all data state changes to cloud
+      const pushStateToCloud = async (updatedData, updatedMembers, updatedUsers) => {
+        // Try Server
+        try {
+          if (updatedData) {
+            await fetch("/api/itinerary", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ itinerary: updatedData })
+            });
+          }
+          if (updatedMembers) {
+            await fetch("/api/members", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ members: updatedMembers })
+            });
+          }
+        } catch (e) {}
+
+        // Try Firebase
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        if (customUrl) {
+          try {
+            const cleanUrl = customUrl.replace(/\/$/, "");
+            if (updatedData) {
+              await fetch(`${cleanUrl}/portal_state/itinerary.json`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData)
+              });
+            }
+            if (updatedMembers) {
+              await fetch(`${cleanUrl}/portal_state/members.json`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedMembers)
+              });
+            }
+          } catch (e) {}
+        }
       };
 
+      // Periodic Auto-Sync Every 6 seconds for multi-device live refresh
+      useEffect(() => {
+        syncWithCloud(true);
+        const timer = setInterval(() => {
+          syncWithCloud(false);
+        }, 6000);
+        return () => clearInterval(timer);
+      }, [syncWithCloud]);
+
+      // Countdown Timer
       useEffect(() => {
         const updateCountdown = () => {
           const target = new Date(data.targetDate || "2026-10-16T10:00").getTime();
@@ -511,12 +686,35 @@
         return () => clearInterval(interval);
       }, [data.targetDate]);
 
-      // Handle Authentication
-      const handleAuth = (e) => {
+      // Update Itinerary
+      const updateData = (updater, logMsg) => {
+        setData(prev => {
+          const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
+          localStorage.setItem("fresher_party_data_v9", JSON.stringify(next));
+          pushStateToCloud(next, null, null);
+          return next;
+        });
+        if (logMsg) notify(logMsg);
+      };
+
+      // Update Committee Members
+      const updateMembers = (updater, logMsg) => {
+        setMembers(prev => {
+          const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
+          localStorage.setItem("fresher_committee_members_v3", JSON.stringify(next));
+          pushStateToCloud(null, next, null);
+          return next;
+        });
+        if (logMsg) notify(logMsg);
+      };
+
+      // Handle Authentication: Instant Log-in on Sign Up & Cloud Push
+      const handleAuth = async (e) => {
         e.preventDefault();
         setAuthError("");
         const email = authEmail.trim().toLowerCase();
         const pass = authPass;
+        const currentDevice = getDeviceInfo();
 
         if (!email || !pass) {
           setAuthError("Please fill in both email and password.");
@@ -527,39 +725,56 @@
 
         if (isSignup) {
           if (updatedUsers.some(u => u.email.toLowerCase() === email)) {
-            setAuthError("An account with this email already exists. Please log in.");
+            setAuthError("An account with this email already exists. Please switch to Log In.");
             return;
           }
 
+          const isMaster = email === ADMIN_EMAIL.toLowerCase();
           const newUser = {
             id: "user-" + Date.now(),
             email: email,
             name: authName.trim() || email.split("@")[0],
             password: pass,
-            role: email === ADMIN_EMAIL.toLowerCase() ? "admin" : "viewer",
-            canEdit: email === ADMIN_EMAIL.toLowerCase(),
-            registeredAt: new Date().toISOString()
+            role: isMaster ? "admin" : "viewer",
+            canEdit: isMaster,
+            registeredAt: new Date().toISOString(),
+            lastLoginAt: new Date().toISOString(),
+            device: currentDevice
           };
 
           updatedUsers.push(newUser);
           setUsers(updatedUsers);
-          localStorage.setItem("fresher_party_users", JSON.stringify(updatedUsers));
+          localStorage.setItem("fresher_party_users_v2", JSON.stringify(updatedUsers));
 
+          // Log in the user immediately
           setCurrentUser(newUser);
           localStorage.setItem("fresher_active_session", JSON.stringify(newUser));
           setAuthModalOpen(false);
-          notify(`🎉 Welcome ${newUser.name}! Your account has been registered.`);
+
+          // Push user details to cloud database
+          await pushUserToCloud(newUser);
+
+          notify(`🎉 Welcome ${newUser.name}! You are now logged in from ${currentDevice}.`);
           triggerConfetti();
         } else {
+          // Login Flow
           const found = updatedUsers.find(u => u.email.toLowerCase() === email && u.password === pass);
           if (!found) {
             setAuthError("Invalid email or password. Please check your credentials.");
             return;
           }
 
+          found.lastLoginAt = new Date().toISOString();
+          found.device = currentDevice;
+          setUsers([...updatedUsers]);
+          localStorage.setItem("fresher_party_users_v2", JSON.stringify(updatedUsers));
+
           setCurrentUser(found);
           localStorage.setItem("fresher_active_session", JSON.stringify(found));
           setAuthModalOpen(false);
+
+          await pushUserToCloud(found);
+
           notify(`👋 Welcome back, ${found.name || found.email}!`);
           if (found.role === "admin") triggerConfetti();
         }
@@ -573,7 +788,8 @@
         notify("Logged out successfully.");
       };
 
-      const toggleUserEditRights = (userEmail, allow) => {
+      // Toggle user edit permissions & push live to cloud
+      const toggleUserEditRights = async (userEmail, allow) => {
         const next = users.map(u => {
           if (u.email.toLowerCase() === userEmail.toLowerCase()) {
             return { ...u, canEdit: allow, role: allow ? "editor" : "viewer" };
@@ -581,7 +797,12 @@
           return u;
         });
         setUsers(next);
-        localStorage.setItem("fresher_party_users", JSON.stringify(next));
+        localStorage.setItem("fresher_party_users_v2", JSON.stringify(next));
+
+        const updatedTarget = next.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
+        if (updatedTarget) {
+          await pushUserToCloud(updatedTarget);
+        }
 
         if (currentUser && currentUser.email.toLowerCase() === userEmail.toLowerCase()) {
           const updatedSelf = { ...currentUser, canEdit: allow, role: allow ? "editor" : "viewer" };
@@ -589,20 +810,76 @@
           localStorage.setItem("fresher_active_session", JSON.stringify(updatedSelf));
         }
 
-        notify(`Editing rights for ${userEmail}: ${allow ? "GRANTED" : "REVOKED"}`);
+        // Try API endpoint
+        try {
+          await fetch(`/api/users/${encodeURIComponent(userEmail)}/rights`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ canEdit: allow })
+          });
+        } catch (e) {}
+
+        notify(`Editing rights for ${userEmail}: ${allow ? "GRANTED (Active)" : "REVOKED (Viewer)"}`);
       };
 
-      const deleteUser = (userEmail) => {
+      // Delete User
+      const deleteUser = async (userEmail) => {
         if (userEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
           alert("Cannot delete the Super Admin account.");
           return;
         }
-        if (!confirm(`Are you sure you want to remove user "${userEmail}"?`)) return;
+        if (!confirm(`Are you sure you want to remove user "${userEmail}" from the registry?`)) return;
 
         const next = users.filter(u => u.email.toLowerCase() !== userEmail.toLowerCase());
         setUsers(next);
-        localStorage.setItem("fresher_party_users", JSON.stringify(next));
+        localStorage.setItem("fresher_party_users_v2", JSON.stringify(next));
+
+        // Delete from Server
+        try {
+          await fetch(`/api/users/${encodeURIComponent(userEmail)}`, { method: "DELETE" });
+        } catch (e) {}
+
+        // Delete from Firebase
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        if (customUrl) {
+          try {
+            const cleanUrl = customUrl.replace(/\/$/, "");
+            const key = userEmail.replace(/[^a-zA-Z0-9]/g, "_");
+            await fetch(`${cleanUrl}/portal_state/users/${key}.json`, { method: "DELETE" });
+          } catch (e) {}
+        }
+
         notify(`User ${userEmail} removed.`);
+      };
+
+      // Export Attendees to CSV
+      const exportAttendeesCSV = () => {
+        const headers = ["Name", "Email", "Role", "Can Edit", "Registered At", "Last Login", "Device Info"];
+        const rows = users.map(u => [
+          `"${u.name || ''}"`,
+          `"${u.email}"`,
+          `"${u.role || 'viewer'}"`,
+          `"${u.canEdit ? 'YES' : 'NO'}"`,
+          `"${u.registeredAt || ''}"`,
+          `"${u.lastLoginAt || ''}"`,
+          `"${u.device || 'Web'}"`
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `freshers2026_registered_users_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        notify("📥 Registered attendees list exported as CSV!");
+      };
+
+      // Copy All Emails
+      const copyAllEmails = () => {
+        const emailList = users.map(u => u.email).join(", ");
+        navigator.clipboard.writeText(emailList);
+        notify("📋 Copied all " + users.length + " user emails to clipboard!");
       };
 
       // Schedule Row Actions
@@ -732,7 +1009,8 @@
 
       const filteredUsers = users.filter(u => 
         u.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        (u.name && u.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        (u.name && u.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (u.device && u.device.toLowerCase().includes(searchQuery.toLowerCase()))
       );
 
       const getCategoryBadge = (type) => {
@@ -878,13 +1156,25 @@
                     <button 
                       onClick={() => setActiveTab("admin")} 
                       className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/40" : "text-amber-300 hover:bg-amber-500/15 border border-amber-500/30")}>
-                      <span>👑</span> Admin Panel
+                      <span>👑</span> Master Dashboard
                     </button>
                   )}
                 </nav>
 
                 {/* Auth & Edit Controls */}
                 <div className="flex items-center gap-3">
+                  {/* Cloud Sync Status Indicator */}
+                  <div 
+                    onClick={() => setCloudConfigModal(true)}
+                    className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-card border border-purple-500/30 cursor-pointer hover:border-purple-400 transition-all text-[11px] font-bold"
+                    title="Click to check or configure cross-device cloud sync">
+                    <span className={"w-2.5 h-2.5 rounded-full animate-pulse " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
+                    <span className="text-gray-200">
+                      {cloudStatus === "server" ? "Server API (Live)" : cloudStatus === "connected" ? "Firebase Cloud" : "Local Sync"}
+                    </span>
+                    {isSyncing && <span className="text-purple-300">🔄</span>}
+                  </div>
+
                   {currentUser ? (
                     <div className="flex items-center gap-3">
                       <div className="hidden sm:block text-right">
@@ -930,7 +1220,7 @@
             {editEnabled && (
               <div className="bg-amber-500/25 border-b-2 border-amber-400/60 py-2.5 px-4 text-center text-xs font-bold text-amber-200 flex items-center justify-center gap-2 shadow-inner">
                 <span className="text-base">⚡</span>
-                <span>Live Editing Mode Active! Add/delete committee members, modify itinerary rows, anchor names, or event details directly.</span>
+                <span>Live Editing Mode Active! All changes sync across devices.</span>
               </div>
             )}
 
@@ -1400,14 +1690,52 @@
               {/* TAB 5: SUPER ADMIN DASHBOARD */}
               {activeTab === "admin" && isSuperAdmin && (
                 <div className="space-y-8">
-                  <div className="border-b border-purple-500/20 pb-6 space-y-3">
-                    <div className="inline-block px-4 py-1.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/40 text-xs font-black uppercase tracking-wider">
-                      👑 Devansh Pandey's Master Dashboard
+                  <div className="border-b border-purple-500/20 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="inline-block px-4 py-1.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/40 text-xs font-black uppercase tracking-wider">
+                        👑 Devansh Pandey's Master Command Center
+                      </div>
+                      <h2 className="font-heading text-4xl sm:text-5xl font-black text-white">Multi-Device User Registry</h2>
+                      <p className="text-sm text-purple-200 max-w-2xl font-medium">
+                        Live dashboard of every student registered from any device (phones, laptops, tablets). Control editor permissions in 1 click.
+                      </p>
                     </div>
-                    <h2 className="font-heading text-4xl sm:text-5xl font-black text-white">User Registry & Rights Management</h2>
-                    <p className="text-sm text-purple-200 max-w-2xl font-medium">
-                      All accounts registered on this portal are displayed below. Grant or revoke editing rights anytime.
-                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button 
+                        onClick={() => syncWithCloud(true)} 
+                        className="px-4 py-2.5 rounded-xl glass-card border border-purple-400/40 hover:border-purple-300 text-xs font-bold text-white flex items-center gap-2 transition-all">
+                        <span>🔄</span> {isSyncing ? "Syncing..." : "Sync Now"}
+                      </button>
+                      <button 
+                        onClick={() => setCloudConfigModal(true)} 
+                        className="px-4 py-2.5 rounded-xl glass-card border border-cyan-400/40 text-cyan-200 hover:bg-cyan-950/40 text-xs font-bold flex items-center gap-2 transition-all">
+                        <span>⚙️</span> Cloud Setup
+                      </button>
+                      <button 
+                        onClick={copyAllEmails} 
+                        className="px-4 py-2.5 rounded-xl glass-card border border-pink-400/40 text-pink-200 hover:bg-pink-950/40 text-xs font-bold flex items-center gap-2 transition-all">
+                        <span>📋</span> Copy All Emails
+                      </button>
+                      <button 
+                        onClick={exportAttendeesCSV} 
+                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
+                        <span>📥</span> Export CSV
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Cloud Connection Live Banner */}
+                  <div className={"p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 text-xs font-bold " + (cloudStatus === "server" ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : cloudStatus === "connected" ? "bg-cyan-950/40 border-cyan-500/40 text-cyan-200" : "bg-purple-950/40 border-purple-500/40 text-purple-200")}>
+                    <div className="flex items-center gap-2.5">
+                      <span className={"w-3 h-3 rounded-full animate-ping " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
+                      <span>
+                        <strong>Live Multi-Device Cloud Status:</strong> {cloudStatus === "server" ? "Node.js Server REST API Active & Connected" : cloudStatus === "connected" ? "Firebase Realtime Cloud Database Connected" : "Local Database Mode (Configure Firebase URL for serverless cross-device cloud sync)"}
+                      </span>
+                    </div>
+                    <div className="text-gray-400">
+                      Last Sync: {lastSyncTime ? lastSyncTime.toLocaleTimeString() : "Just now"}
+                    </div>
                   </div>
 
                   {/* Statistics Overview */}
@@ -1415,18 +1743,22 @@
                     <div className="glass-card p-5 rounded-3xl border border-purple-400/40">
                       <div className="text-xs text-purple-300 uppercase font-black">Total Registered</div>
                       <div className="font-heading text-4xl font-black text-white mt-1">{users.length}</div>
+                      <div className="text-[11px] text-gray-400 mt-1">Across all devices</div>
                     </div>
                     <div className="glass-card p-5 rounded-3xl border border-emerald-400/40">
                       <div className="text-xs text-emerald-300 uppercase font-black">Active Editors</div>
                       <div className="font-heading text-4xl font-black text-emerald-300 mt-1">{users.filter(u => u.canEdit).length}</div>
+                      <div className="text-[11px] text-gray-400 mt-1">Granted edit permissions</div>
                     </div>
                     <div className="glass-card p-5 rounded-3xl border border-pink-400/40">
                       <div className="text-xs text-pink-300 uppercase font-black">Attendees</div>
                       <div className="font-heading text-4xl font-black text-pink-300 mt-1">{users.filter(u => !u.canEdit).length}</div>
+                      <div className="text-[11px] text-gray-400 mt-1">Students & Viewers</div>
                     </div>
                     <div className="glass-card p-5 rounded-3xl border border-amber-400/40">
                       <div className="text-xs text-amber-300 uppercase font-black">Super Admin</div>
                       <div className="font-heading text-4xl font-black text-amber-300 mt-1">1</div>
+                      <div className="text-[11px] text-gray-400 mt-1">Devansh Pandey</div>
                     </div>
                   </div>
 
@@ -1434,13 +1766,13 @@
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <input 
                       type="text" 
-                      placeholder="Search registered users by email or name..." 
+                      placeholder="Search users by email, name, or device..." 
                       value={searchQuery}
                       onInput={e => setSearchQuery(e.target.value)}
                       className="w-full sm:w-96 glass-card px-5 py-3 rounded-2xl text-sm border border-purple-400/40 text-white placeholder-gray-400 focus:outline-none focus:border-purple-300 font-medium"
                     />
                     <div className="text-xs text-purple-200 font-bold">
-                      Showing {filteredUsers.length} of {users.length} users
+                      Showing {filteredUsers.length} of {users.length} registered users
                     </div>
                   </div>
 
@@ -1450,7 +1782,8 @@
                       <table className="w-full text-left text-sm">
                         <thead className="bg-purple-950/80 text-purple-200 text-xs uppercase border-b border-purple-500/30 font-heading tracking-wider">
                           <tr>
-                            <th className="py-4 px-6">User / Email</th>
+                            <th className="py-4 px-6">User / Registered Email</th>
+                            <th className="py-4 px-6">Device & Browser</th>
                             <th className="py-4 px-6">Registered At</th>
                             <th className="py-4 px-6">Current Role</th>
                             <th className="py-4 px-6">Editing Rights</th>
@@ -1460,16 +1793,30 @@
                         <tbody className="divide-y divide-purple-500/15">
                           {filteredUsers.map(u => {
                             const isMaster = u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-                            const regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "System Default";
+                            const regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "System Default";
 
                             return (
                               <tr key={u.id || u.email} className="hover:bg-purple-900/20 transition-colors">
                                 <td className="py-4 px-6">
                                   <div className="font-bold text-white flex items-center gap-2">
-                                    {u.name || u.email.split("@")[0]}
+                                    <span>{u.name || u.email.split("@")[0]}</span>
                                     {isMaster && <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/50 font-black">SUPER ADMIN</span>}
                                   </div>
-                                  <div className="text-xs text-purple-300 font-mono">{u.email}</div>
+                                  <div className="text-xs text-purple-300 font-mono flex items-center gap-2 mt-0.5">
+                                    <span>{u.email}</span>
+                                    <button 
+                                      onClick={() => { navigator.clipboard.writeText(u.email); notify(`Copied ${u.email}`); }}
+                                      className="text-[10px] text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-white/5"
+                                      title="Copy email">
+                                      📋
+                                    </button>
+                                  </div>
+                                </td>
+
+                                <td className="py-4 px-6">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-gray-900/80 text-gray-300 border border-gray-700 inline-flex items-center gap-1.5">
+                                    {u.device || "Web Browser"}
+                                  </span>
                                 </td>
 
                                 <td className="py-4 px-6 text-xs text-gray-300 font-medium">
@@ -1532,6 +1879,73 @@
                 </div>
               </div>
             </footer>
+
+            {/* MODAL: CLOUD SYNC & DATABASE CONFIGURATION */}
+            {cloudConfigModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+                <div className="glass-card max-w-lg w-full p-7 rounded-3xl relative border-2 border-cyan-400 shadow-2xl space-y-5">
+                  <button 
+                    onClick={() => setCloudConfigModal(false)} 
+                    className="absolute top-5 right-5 text-gray-400 hover:text-white text-lg p-2">
+                    ✕
+                  </button>
+
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 text-xs font-bold">
+                      <span>☁️</span> Multi-Device Realtime Cloud Engine
+                    </div>
+                    <h3 className="font-heading text-2xl font-black text-white">
+                      Cloud Sync & Database Settings
+                    </h3>
+                    <p className="text-xs text-purple-200">
+                      Ensure every user signup across different phones and laptops syncs directly to your master dashboard.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 text-left">
+                    <div className="p-4 rounded-2xl bg-black/40 border border-purple-500/30 text-xs space-y-2">
+                      <div className="text-white font-bold flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                        Status: {cloudStatus === "server" ? "Connected via Node.js Server" : cloudStatus === "connected" ? "Connected via Firebase Cloud" : "Local Storage Mode"}
+                      </div>
+                      <p className="text-gray-300 text-[11px] leading-relaxed">
+                        To enable instant serverless cross-device sync on static hosting (e.g. Render / GitHub Pages), enter a free Firebase Realtime Database URL below.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-black uppercase text-purple-200 mb-1">
+                        Firebase Realtime Database URL (Optional)
+                      </label>
+                      <input 
+                        type="url" 
+                        value={firebaseUrl}
+                        onChange={e => setFirebaseUrl(e.target.value)}
+                        placeholder="https://your-project-default-rtdb.firebaseio.com"
+                        className="w-full px-4 py-3 rounded-2xl glass-card border border-cyan-400/60 text-white placeholder-gray-500 focus:outline-none text-xs font-mono"
+                      />
+                      <p className="text-[10px] text-gray-400 mt-1">
+                        Tip: Create a free Realtime Database at <a href="https://console.firebase.google.com" target="_blank" className="text-cyan-300 underline">console.firebase.google.com</a> with test rules (read: true, write: true).
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex gap-3">
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          localStorage.setItem("fresher_firebase_url", firebaseUrl.trim());
+                          syncWithCloud(true);
+                          notify("Cloud sync settings saved & sync triggered!");
+                          setCloudConfigModal(false);
+                        }}
+                        className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-sm shadow-xl shadow-cyan-600/30 transition-all">
+                        Save & Test Connection
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* MODAL: ADD NEW PERFORMANCE / ROW */}
             {isAddingRow && (
@@ -1603,8 +2017,8 @@
                           value={insertPosition} 
                           onChange={e => setInsertPosition(e.target.value)}
                           className="w-full px-4 py-3 rounded-2xl glass-card border border-purple-400 text-white focus:outline-none font-bold text-sm bg-gray-950">
-                          <option value="bottom" className="bg-gray-950 text-white">At the end (Bottom)</option>
-                          <option value="top" className="bg-gray-950 text-white">At the start (Top)</option>
+                          <option value="bottom" className="bg-gray-950 text-white">At Bottom (End)</option>
+                          <option value="top" className="bg-gray-950 text-white">At Top (Beginning)</option>
                         </select>
                       </div>
                     </div>
@@ -1618,8 +2032,8 @@
                       </button>
                       <button 
                         type="submit" 
-                        className="w-1/2 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-xl shadow-emerald-600/30 transition-all">
-                        Add to Itinerary
+                        className="w-1/2 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/30 transition-all">
+                        Save Row
                       </button>
                     </div>
                   </form>
@@ -1639,10 +2053,10 @@
 
                   <div className="space-y-1">
                     <h3 className="font-heading text-2xl font-black text-white flex items-center gap-2">
-                      <span>👤</span> Add Committee Member
+                      <span>👥</span> Add Organizing Member
                     </h3>
                     <p className="text-xs text-purple-200">
-                      Add a student member to an organizing department with their role and roll number.
+                      Add a student member to an organizing department roster.
                     </p>
                   </div>
 
@@ -1728,7 +2142,7 @@
               </div>
             )}
 
-            {/* MODAL: AUTHENTICATION */}
+            {/* MODAL: AUTHENTICATION (SIGNUP & LOGIN WITH AUTO-LOGIN) */}
             {authModalOpen && (
               <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
                 <div className="glass-card max-w-md w-full p-8 rounded-3xl relative border-2 border-purple-400 shadow-2xl space-y-6">
@@ -1760,7 +2174,7 @@
                           required 
                           value={authName}
                           onInput={e => setAuthName(e.target.value)}
-                          placeholder="e.g. Devansh Pandey"
+                          placeholder="e.g. Parth Gupta"
                           className="w-full px-4 py-3 rounded-2xl glass-card border border-purple-400 text-white placeholder-gray-500 focus:outline-none text-sm font-medium"
                         />
                       </div>
@@ -1799,7 +2213,7 @@
                     <button 
                       type="submit" 
                       className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-purple-600/40 transition-all">
-                      {isSignup ? "Create Account & Join" : "Log In"}
+                      {isSignup ? "Create Account & Join (Instant Login)" : "Log In"}
                     </button>
                   </form>
 
