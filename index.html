@@ -215,7 +215,7 @@
       "Technical Department",
       "Video & Photography Department",
       "Sound Department",
-      "Management & Hospitality Department",
+      "Disciplinary & Hospitality Department",
       "Anchors",
       "Rampwalk",
       "Fillers",
@@ -230,16 +230,17 @@
       { id: "m4", department: "Video & Photography Department", role: "Member", name: "Parth Gupta", rollNo: "NOT FOUND" },
       { id: "m5", department: "Video & Photography Department", role: "Member", name: "Anand Kumar", rollNo: "2500461520024" },
       { id: "m6", department: "Sound Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "NOT FOUND" },
-      { id: "m7", department: "Management & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
-      { id: "m8", department: "Management & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
-      { id: "m9", department: "Management & Hospitality Department", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
-      { id: "m10", department: "Management & Hospitality Department", role: "Member", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
-      { id: "m11", department: "Management & Hospitality Department", role: "Member", name: "Shivanand Pal", rollNo: "2500461520165" },
-      { id: "m12", department: "Management & Hospitality Department", role: "Member", name: "Yash Gupta", rollNo: "2500460100188" },
-      { id: "m13", department: "Management & Hospitality Department", role: "Member", name: "Rohit Kumar", rollNo: "2500460100151" },
-      { id: "m14", department: "Management & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
-      { id: "m15", department: "Management & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
-      { id: "m16", department: "Management & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
+      { id: "m0", department: "Disciplinary & Hospitality Department", role: "Management Lead", name: "Devansh Pandey", rollNo: "2500461520057" },
+      { id: "m7", department: "Disciplinary & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
+      { id: "m8", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
+      { id: "m9", department: "Disciplinary & Hospitality Department", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
+      { id: "m10", department: "Disciplinary & Hospitality Department", role: "Member", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
+      { id: "m11", department: "Disciplinary & Hospitality Department", role: "Member", name: "Shivanand Pal", rollNo: "2500461520165" },
+      { id: "m12", department: "Disciplinary & Hospitality Department", role: "Member", name: "Yash Gupta", rollNo: "2500460100188" },
+      { id: "m13", department: "Disciplinary & Hospitality Department", role: "Member", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m14", department: "Disciplinary & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m15", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
+      { id: "m16", department: "Disciplinary & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
       { id: "m17", department: "Anchors", role: "Anchor", name: "Devansh Pandey", rollNo: "2500461520057" },
       { id: "m18", department: "Anchors", role: "Anchor", name: "Riya Jain", rollNo: "2500460100148" },
       { id: "m19", department: "Anchors", role: "Anchor", name: "Rudraksha Sharma", rollNo: "2500460100154" },
@@ -392,7 +393,7 @@
       // Committee Members State
       const [members, setMembers] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_committee_members_v3");
+          const saved = localStorage.getItem("fresher_committee_members_v4");
           return saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
         } catch (e) {
           return DEFAULT_MEMBERS;
@@ -527,7 +528,7 @@
             }
             if (remote.members) {
               setMembers(remote.members);
-              localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
+              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
             }
             setCloudStatus("server");
             setLastSyncTime(new Date());
@@ -567,7 +568,7 @@
                 }
                 if (remote.members) {
                   setMembers(remote.members);
-                  localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
+                  localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
                 }
               }
               setCloudStatus("connected");
@@ -701,7 +702,7 @@
       const updateMembers = (updater, logMsg) => {
         setMembers(prev => {
           const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
-          localStorage.setItem("fresher_committee_members_v3", JSON.stringify(next));
+          localStorage.setItem("fresher_committee_members_v4", JSON.stringify(next));
           pushStateToCloud(null, next, null);
           return next;
         });
@@ -1018,6 +1019,39 @@
         return cat ? cat.badge : "bg-slate-700/50 text-slate-200 border-slate-600";
       };
 
+      const getLeadBadgeStyle = (role, dept) => {
+        const r = (role || "").toLowerCase();
+        const d = (dept || "").toLowerCase();
+        const isLead = r.includes("lead") || r.includes("head") || r.includes("anchor") || r.includes("composer");
+        if (!isLead) return "bg-purple-500/20 text-purple-200 border-purple-400/30";
+
+        if (r.includes("management") || d.includes("disciplinary") || d.includes("management")) {
+          return "bg-gradient-to-r from-amber-500/30 to-orange-500/30 text-amber-300 border-amber-400/60 shadow-sm shadow-amber-500/20";
+        }
+        if (d.includes("rampwalk")) {
+          return "bg-gradient-to-r from-rose-500/30 to-pink-500/30 text-pink-300 border-pink-400/60 shadow-sm shadow-pink-500/20";
+        }
+        if (d.includes("art") || d.includes("craft")) {
+          return "bg-gradient-to-r from-emerald-500/30 to-teal-500/30 text-emerald-300 border-emerald-400/60 shadow-sm shadow-emerald-500/20";
+        }
+        if (d.includes("anchors")) {
+          return "bg-gradient-to-r from-cyan-500/30 to-blue-500/30 text-cyan-300 border-cyan-400/60 shadow-sm shadow-cyan-500/20";
+        }
+        if (d.includes("technical")) {
+          return "bg-gradient-to-r from-indigo-500/30 to-purple-500/30 text-indigo-300 border-indigo-400/60 shadow-sm shadow-indigo-500/20";
+        }
+        if (d.includes("sound")) {
+          return "bg-gradient-to-r from-fuchsia-500/30 to-violet-500/30 text-fuchsia-300 border-fuchsia-400/60 shadow-sm shadow-fuchsia-500/20";
+        }
+        if (d.includes("video") || d.includes("photo")) {
+          return "bg-gradient-to-r from-sky-500/30 to-blue-600/30 text-sky-300 border-sky-400/60 shadow-sm shadow-sky-500/20";
+        }
+        if (d.includes("fillers")) {
+          return "bg-gradient-to-r from-yellow-500/30 to-lime-500/30 text-yellow-300 border-yellow-400/60 shadow-sm shadow-yellow-500/20";
+        }
+        return "bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border-purple-400/50";
+      };
+
       return (
         <div>
           {/* PRINT-ONLY VIEW: CLEAN PROFESSIONAL BLACK & WHITE */}
@@ -1280,7 +1314,7 @@
                       <button 
                         onClick={() => setActiveTab("members")}
                         className="px-6 py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-sm text-amber-300 border border-amber-400/30 transition-all">
-                        Department Committee (37 Members) →
+                        Department Committee (38 Members) →
                       </button>
                     </div>
                   </section>
@@ -1527,6 +1561,56 @@
                     </div>
                   </div>
 
+                  {/* MR. & MS. FRESHERS 2025-26 GOLDEN SPOTLIGHT */}
+                  <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border-2 border-amber-400/80 shadow-[0_0_35px_rgba(251,191,36,0.35)] bg-gradient-to-br from-amber-500/20 via-yellow-900/30 to-purple-950/60 backdrop-blur-xl">
+                    {/* Glowing background accents */}
+                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-yellow-300/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="relative z-10 flex flex-col items-center text-center space-y-5">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-300/50 shadow-inner">
+                        <span className="text-base animate-pulse">👑</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-amber-200">The Crown Spotlight</span>
+                        <span className="text-base animate-pulse">👑</span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-heading text-2xl sm:text-4xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-100 drop-shadow-[0_2px_12px_rgba(245,158,11,0.5)]">
+                          MR. &amp; MS. FRESHERS 2025-26
+                        </h3>
+                        <p className="text-xs sm:text-sm text-amber-200/80 mt-1 max-w-xl mx-auto font-medium">
+                          Leading the celebration with charisma, royalty &amp; festive elegance
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-2xl pt-2">
+                        {/* Devansh Pandey - Mr Fresher */}
+                        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-amber-400/60 bg-gradient-to-b from-amber-500/15 to-black/40 shadow-lg shadow-amber-500/10 flex items-center gap-4 text-left transform hover:scale-[1.02] transition-transform">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-2xl font-black shadow-md shadow-amber-400/40 text-gray-950 shrink-0">
+                            👑
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 block">MR. FRESHER 2025-26</span>
+                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Devansh Pandey</h4>
+                            <p className="text-xs text-amber-200/75 font-mono mt-0.5">Management Lead • Anchor</p>
+                          </div>
+                        </div>
+
+                        {/* Riya Jain - Ms Fresher */}
+                        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-amber-400/60 bg-gradient-to-b from-amber-500/15 to-black/40 shadow-lg shadow-amber-500/10 flex items-center gap-4 text-left transform hover:scale-[1.02] transition-transform">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-300 to-amber-500 flex items-center justify-center text-2xl font-black shadow-md shadow-amber-400/40 text-gray-950 shrink-0">
+                            ✨
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 block">MS. FRESHER 2025-26</span>
+                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Riya Jain</h4>
+                            <p className="text-xs text-amber-200/75 font-mono mt-0.5">Art &amp; Craft Lead • Anchor</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Search and Department Filter Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <input 
@@ -1608,7 +1692,7 @@
                                       </td>
 
                                       <td className="py-3.5 px-4">
-                                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-200 border border-purple-400/30">
+                                        <span className={"px-2.5 py-1 rounded-lg text-xs font-bold border transition-all inline-block " + getLeadBadgeStyle(m.role, dept)}>
                                           <Ed v={m.role} on={editEnabled} ph="Role" label="Member Role" set={(val) => editMemberField(m.id, "role", val)} />
                                         </span>
                                       </td>

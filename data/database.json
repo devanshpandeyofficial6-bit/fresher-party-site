@@ -10,20 +10,9 @@
       "registeredAt": "2026-09-29T06:13:45.839Z",
       "lastLoginAt": "2026-09-29T06:13:45.839Z",
       "device": "Server Master"
-    },
-    {
-      "id": "user-1790662425840",
-      "email": "student1@campus.edu",
-      "password": "password123",
-      "name": "Rohan Sharma",
-      "role": "editor",
-      "canEdit": true,
-      "registeredAt": "2026-09-29T06:13:45.840Z",
-      "lastLoginAt": "2026-09-29T06:13:45.840Z",
-      "device": "Android ?? (Chrome)"
     }
   ],
   "itinerary": null,
   "members": null,
-  "lastUpdated": "2026-09-29T06:13:54.253Z"
+  "lastUpdated": "2026-09-29T06:25:33.552Z"
 }
