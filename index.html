@@ -192,6 +192,8 @@
     const ADMIN_EMAIL = "devanshpandeyofficial6@gmail.com";
     const ADMIN_PASS = "iamdumb@123";
 
+    const DEFAULT_FIREBASE_URL = "https://freshers-c9de2-default-rtdb.firebaseio.com";
+
     // Supported Performance / Row Categories
     const ROW_CATEGORIES = [
       { id: "perf", label: "Performance", badge: "bg-purple-500/25 text-purple-200 border-purple-400/40" },
@@ -447,7 +449,7 @@
       const [isSyncing, setIsSyncing] = useState(false);
       const [cloudConfigModal, setCloudConfigModal] = useState(false);
       const [firebaseUrl, setFirebaseUrl] = useState(() => {
-        return localStorage.getItem("fresher_firebase_url") || "";
+        return localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
       });
 
       // UI States
@@ -504,44 +506,24 @@
         if (isSyncing && !forced) return;
         setIsSyncing(true);
 
-        // Tier 1: Try Local / Hosted Node Server REST API
-        try {
-          const res = await fetch("/api/sync", { cache: "no-store" });
-          if (res.ok) {
-            const remote = await res.json();
-            if (remote.users && Array.isArray(remote.users)) {
-              setUsers(prev => {
-                const map = new Map();
-                prev.forEach(u => map.set(u.email.toLowerCase(), u));
-                remote.users.forEach(u => {
-                  const existing = map.get(u.email.toLowerCase()) || {};
-                  map.set(u.email.toLowerCase(), { ...existing, ...u });
-                });
-                const merged = Array.from(map.values());
-                localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
-                return merged;
-              });
+        // Helper to update current active user session if permissions changed remotely
+        const refreshCurrentSessionFromUsers = (userList) => {
+          try {
+            const activeSession = JSON.parse(localStorage.getItem("fresher_active_session") || "null");
+            if (activeSession && activeSession.email) {
+              const matched = userList.find(u => u.email.toLowerCase() === activeSession.email.toLowerCase());
+              if (matched && (matched.canEdit !== activeSession.canEdit || matched.role !== activeSession.role)) {
+                const refreshed = { ...activeSession, canEdit: matched.canEdit, role: matched.role };
+                localStorage.setItem("fresher_active_session", JSON.stringify(refreshed));
+                setCurrentUser(refreshed);
+              }
             }
-            if (remote.itinerary) {
-              setData(remote.itinerary);
-              localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
-            }
-            if (remote.members) {
-              setMembers(remote.members);
-              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
-            }
-            setCloudStatus("server");
-            setLastSyncTime(new Date());
-            setIsSyncing(false);
-            return;
-          }
-        } catch (e) {
-          // Server endpoint not available; fall through to Firebase
-        }
+          } catch (e) {}
+        };
 
-        // Tier 2: Try Firebase Realtime Database
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
-        if (customUrl && typeof firebase !== "undefined") {
+        // Tier 1: Firebase Realtime Database (Real-time global sync across all devices)
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
+        if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
             const res = await fetch(`${cleanUrl}/portal_state.json`);
@@ -559,6 +541,7 @@
                     });
                     const merged = Array.from(map.values());
                     localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                    refreshCurrentSessionFromUsers(merged);
                     return merged;
                   });
                 }
@@ -581,6 +564,42 @@
           }
         }
 
+        // Tier 2: Try Local / Hosted Node Server REST API
+        try {
+          const res = await fetch("/api/sync", { cache: "no-store" });
+          if (res.ok) {
+            const remote = await res.json();
+            if (remote.users && Array.isArray(remote.users)) {
+              setUsers(prev => {
+                const map = new Map();
+                prev.forEach(u => map.set(u.email.toLowerCase(), u));
+                remote.users.forEach(u => {
+                  const existing = map.get(u.email.toLowerCase()) || {};
+                  map.set(u.email.toLowerCase(), { ...existing, ...u });
+                });
+                const merged = Array.from(map.values());
+                localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                refreshCurrentSessionFromUsers(merged);
+                return merged;
+              });
+            }
+            if (remote.itinerary) {
+              setData(remote.itinerary);
+              localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+            }
+            if (remote.members) {
+              setMembers(remote.members);
+              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
+            }
+            setCloudStatus("server");
+            setLastSyncTime(new Date());
+            setIsSyncing(false);
+            return;
+          }
+        } catch (e) {
+          // Fall through to local storage
+        }
+
         // Tier 3: Local Storage mode
         setCloudStatus("local");
         setLastSyncTime(new Date());
@@ -589,18 +608,7 @@
 
       // Push a registered/updated user to cloud backend
       const pushUserToCloud = async (userObj) => {
-        // Try server
-        try {
-          const res = await fetch("/api/auth/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userObj)
-          });
-          if (res.ok) return true;
-        } catch (e) {}
-
-        // Try Firebase
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
         if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
@@ -610,34 +618,23 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(userObj)
             });
-            return true;
           } catch (e) {}
         }
-        return false;
+
+        // Try server as well
+        try {
+          await fetch("/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userObj)
+          });
+        } catch (e) {}
+        return true;
       };
 
       // Push all data state changes to cloud
       const pushStateToCloud = async (updatedData, updatedMembers, updatedUsers) => {
-        // Try Server
-        try {
-          if (updatedData) {
-            await fetch("/api/itinerary", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ itinerary: updatedData })
-            });
-          }
-          if (updatedMembers) {
-            await fetch("/api/members", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ members: updatedMembers })
-            });
-          }
-        } catch (e) {}
-
-        // Try Firebase
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
         if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
@@ -657,6 +654,24 @@
             }
           } catch (e) {}
         }
+
+        // Try Server as well
+        try {
+          if (updatedData) {
+            await fetch("/api/itinerary", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ itinerary: updatedData })
+            });
+          }
+          if (updatedMembers) {
+            await fetch("/api/members", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ members: updatedMembers })
+            });
+          }
+        } catch (e) {}
       };
 
       // Periodic Auto-Sync Every 6 seconds for multi-device live refresh
