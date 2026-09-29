@@ -455,6 +455,8 @@
       // UI States
       const [editMode, setEditMode] = useState(false);
       const [activeTab, setActiveTab] = useState("home"); // 'home' | 'schedule' | 'members' | 'team' | 'admin'
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+      const [viewMode, setViewMode] = useState("auto"); // 'auto' | 'phone' | 'desktop'
       const [authModalOpen, setAuthModalOpen] = useState(false);
       const [isSignup, setIsSignup] = useState(false);
       const [authEmail, setAuthEmail] = useState("");
@@ -1161,108 +1163,207 @@
             )}
 
             {/* Navigation Bar */}
-            <header className="sticky top-0 z-40 glass-nav px-4 md:px-8 py-3.5 shadow-xl">
-              <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <header className="sticky top-0 z-40 glass-nav px-3 sm:px-6 py-2.5 sm:py-3.5 shadow-xl">
+              <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
                 
                 {/* Logo & Title */}
-                <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => setActiveTab("home")}>
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/40 border border-purple-300/40">
+                <div className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none min-w-0" onClick={() => setActiveTab("home")}>
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 flex items-center justify-center text-xl sm:text-2xl shadow-lg shadow-purple-500/40 border border-purple-300/40 shrink-0">
                     🎉
                   </div>
-                  <div>
-                    <div className="font-heading font-black text-2xl tracking-tight bg-gradient-to-r from-purple-300 via-pink-300 to-amber-200 bg-clip-text text-transparent">
+                  <div className="min-w-0">
+                    <div className="font-heading font-black text-lg sm:text-2xl tracking-tight bg-gradient-to-r from-purple-300 via-pink-300 to-amber-200 bg-clip-text text-transparent truncate leading-tight">
                       Freshers 2026
                     </div>
-                    <div className="text-[11px] font-extrabold uppercase tracking-widest text-purple-300 -mt-1">
-                      October 16 • 10:00 AM
+                    <div className="text-[9px] sm:text-[11px] font-extrabold uppercase tracking-widest text-purple-300 -mt-0.5 truncate">
+                      Oct 16 • 10:00 AM
                     </div>
                   </div>
                 </div>
 
-                {/* Nav Tabs */}
-                <nav className="hidden md:flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-purple-500/20">
+                {/* Desktop Nav Tabs */}
+                <nav className={(viewMode === "phone" ? "hidden" : "hidden md:flex") + " items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-purple-500/20"}>
                   <button 
                     onClick={() => setActiveTab("home")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "home" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "home" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
                     Overview
                   </button>
                   <button 
                     onClick={() => setActiveTab("schedule")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
                     Itinerary & Acts
                   </button>
                   <button 
                     onClick={() => setActiveTab("members")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
-                    <span>👥</span> Committee Members
+                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    <span>👥</span> Committee
                   </button>
                   <button 
                     onClick={() => setActiveTab("team")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "team" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "team" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
                     Anchor Squad
                   </button>
                   {isSuperAdmin && (
                     <button 
                       onClick={() => setActiveTab("admin")} 
-                      className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/40" : "text-amber-300 hover:bg-amber-500/15 border border-amber-500/30")}>
-                      <span>👑</span> Master Dashboard
+                      className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/40" : "text-amber-300 hover:bg-amber-500/15 border border-amber-500/30")}>
+                      <span>👑</span> Admin
                     </button>
                   )}
                 </nav>
 
-                {/* Auth & Edit Controls */}
-                <div className="flex items-center gap-3">
+                {/* Right Action Controls */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                  {/* View Switcher: Auto / Phone / Desktop */}
+                  <div className="hidden lg:flex items-center bg-black/50 p-1 rounded-xl border border-purple-500/30 text-[11px] font-bold">
+                    <button
+                      onClick={() => setViewMode("auto")}
+                      className={"px-2 py-1 rounded-lg transition-all " + (viewMode === "auto" ? "bg-purple-600 text-white" : "text-gray-400 hover:text-white")}
+                      title="Responsive (Adapts to screen size)">
+                      Auto
+                    </button>
+                    <button
+                      onClick={() => setViewMode("phone")}
+                      className={"px-2 py-1 rounded-lg transition-all flex items-center gap-1 " + (viewMode === "phone" ? "bg-purple-600 text-white shadow" : "text-gray-400 hover:text-white")}
+                      title="Force Phone View layout">
+                      📱 Phone
+                    </button>
+                    <button
+                      onClick={() => setViewMode("desktop")}
+                      className={"px-2 py-1 rounded-lg transition-all flex items-center gap-1 " + (viewMode === "desktop" ? "bg-purple-600 text-white shadow" : "text-gray-400 hover:text-white")}
+                      title="Force Desktop View layout">
+                      💻 Desktop
+                    </button>
+                  </div>
+
                   {/* Cloud Sync Status Indicator */}
                   <div 
                     onClick={() => setCloudConfigModal(true)}
-                    className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-card border border-purple-500/30 cursor-pointer hover:border-purple-400 transition-all text-[11px] font-bold"
+                    className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl glass-card border border-purple-500/30 cursor-pointer hover:border-purple-400 transition-all text-[10px] sm:text-xs font-bold"
                     title="Click to check or configure cross-device cloud sync">
-                    <span className={"w-2.5 h-2.5 rounded-full animate-pulse " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
-                    <span className="text-gray-200">
-                      {cloudStatus === "server" ? "Server API (Live)" : cloudStatus === "connected" ? "Firebase Cloud" : "Local Sync"}
+                    <span className={"w-2 h-2 rounded-full animate-pulse " + (cloudStatus === "connected" ? "bg-cyan-400" : cloudStatus === "server" ? "bg-emerald-400" : "bg-amber-400")}></span>
+                    <span className="hidden sm:inline text-gray-200">
+                      {cloudStatus === "connected" ? "Firebase" : cloudStatus === "server" ? "Server" : "Local"}
                     </span>
-                    {isSyncing && <span className="text-purple-300">🔄</span>}
                   </div>
 
                   {currentUser ? (
-                    <div className="flex items-center gap-3">
-                      <div className="hidden sm:block text-right">
-                        <div className="text-xs font-bold text-white max-w-[170px] truncate">{currentUser.name || currentUser.email}</div>
-                        <div className={"text-[10px] font-bold " + (isSuperAdmin ? "text-amber-300 font-mono" : currentUser.canEdit ? "text-emerald-300" : "text-purple-300")}>
-                          {isSuperAdmin ? "👑 Super Admin" : currentUser.canEdit ? "✏️ Editor Access" : "🎉 Attendee"}
-                        </div>
-                      </div>
-
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       {hasEditPermission && (
                         <button 
                           onClick={() => setEditMode(!editMode)} 
-                          className={"text-xs px-3.5 py-2 rounded-xl font-black border transition-all flex items-center gap-1.5 " + (editMode ? "bg-amber-400 text-black border-amber-300 shadow-lg shadow-amber-400/30 animate-pulse" : "bg-amber-500/20 border-amber-400 text-amber-200 hover:bg-amber-500/30")}>
-                          <span>✏️</span> {editMode ? "Exit Edit" : "Edit Mode"}
+                          className={"text-xs px-2.5 sm:px-3 py-1.5 rounded-xl font-bold border transition-all flex items-center gap-1 " + (editMode ? "bg-amber-400 text-black border-amber-300 shadow-md shadow-amber-400/30 animate-pulse" : "bg-amber-500/20 border-amber-400/60 text-amber-200 hover:bg-amber-500/30")}>
+                          <span>✏️</span>
+                          <span className="hidden sm:inline">{editMode ? "Exit Edit" : "Edit"}</span>
                         </button>
                       )}
 
+                      <div className="hidden xl:block text-right pr-1">
+                        <div className="text-xs font-bold text-white max-w-[130px] truncate">{currentUser.name || currentUser.email}</div>
+                        <div className={"text-[10px] font-bold " + (isSuperAdmin ? "text-amber-300 font-mono" : currentUser.canEdit ? "text-emerald-300" : "text-purple-300")}>
+                          {isSuperAdmin ? "👑 Admin" : currentUser.canEdit ? "✏️ Editor" : "🎉 Attendee"}
+                        </div>
+                      </div>
+
                       <button 
                         onClick={handleLogout} 
-                        className="text-xs px-3.5 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-500/40 text-red-200 font-bold transition-all">
-                        Logout
+                        className="text-xs px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-500/40 text-red-200 font-bold transition-all"
+                        title="Sign Out">
+                        <span className="hidden sm:inline">Logout</span>
+                        <span className="sm:hidden">🚪</span>
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button 
                         onClick={() => { setIsSignup(false); setAuthModalOpen(true); }}
-                        className="text-xs px-4 py-2 rounded-xl text-gray-200 hover:text-white font-bold glass-card hover:bg-white/10 transition-all border border-purple-500/30">
+                        className="text-xs px-2.5 sm:px-3 py-1.5 rounded-xl text-gray-200 hover:text-white font-bold glass-card hover:bg-white/10 transition-all border border-purple-500/30">
                         Log In
                       </button>
                       <button 
                         onClick={() => { setIsSignup(true); setAuthModalOpen(true); }}
-                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-lg shadow-purple-600/40 transition-all">
+                        className="text-xs px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-md shadow-purple-600/40 transition-all">
                         Sign Up
                       </button>
                     </div>
                   )}
+
+                  {/* Hamburger Menu Toggle Button (Mobile) */}
+                  <button 
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " p-2 rounded-xl glass-card border border-purple-500/40 text-purple-200 hover:text-white focus:outline-none"}
+                    aria-label="Toggle Navigation Menu">
+                    <span className="text-lg leading-none">{mobileMenuOpen ? "✕" : "☰"}</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Mobile Collapsible Drawer Menu */}
+              {mobileMenuOpen && (
+                <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " pt-3 mt-2 border-t border-purple-500/30 space-y-2 animate-fadeIn"}>
+                  <div className="grid grid-cols-2 gap-1.5 text-xs font-bold">
+                    <button 
+                      onClick={() => { setActiveTab("home"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "home" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>🏠</span> Overview
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("schedule"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>📋</span> Itinerary & Acts
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("members"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "members" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>👥</span> Committee
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("team"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "team" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>🎤</span> Anchor Squad
+                    </button>
+                    {isSuperAdmin && (
+                      <button 
+                        onClick={() => { setActiveTab("admin"); setMobileMenuOpen(false); }} 
+                        className={"p-2.5 col-span-2 rounded-xl flex items-center justify-center gap-2 transition-all " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white font-black" : "glass-card text-amber-300 border border-amber-400/40")}>
+                        <span>👑</span> Master Admin Command Center
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Mode Toggle in Mobile Drawer */}
+                  <div className="p-2 rounded-xl bg-black/40 border border-purple-500/20 flex items-center justify-between text-xs">
+                    <span className="text-gray-400 font-semibold">View Mode:</span>
+                    <div className="flex gap-1 font-bold">
+                      <button 
+                        onClick={() => setViewMode("auto")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "auto" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        Auto
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("phone")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "phone" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        📱 Phone
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("desktop")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "desktop" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        💻 Desktop
+                      </button>
+                    </div>
+                  </div>
+
+                  {currentUser && (
+                    <div className="px-3 py-2 rounded-xl bg-purple-950/40 border border-purple-500/20 text-xs flex items-center justify-between">
+                      <div className="truncate">
+                        <span className="text-white font-bold block truncate">{currentUser.name || currentUser.email}</span>
+                        <span className="text-purple-300 text-[10px]">{isSuperAdmin ? "👑 Super Admin" : currentUser.canEdit ? "✏️ Editor Access" : "🎉 Attendee"}</span>
+                      </div>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30">Active</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </header>
 
             {/* Edit Mode Banner */}
@@ -1274,7 +1375,7 @@
             )}
 
             {/* Main Page View */}
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-12">
+            <main className={"flex-1 mx-auto w-full px-3 sm:px-6 md:px-8 py-5 sm:py-8 space-y-8 sm:space-y-12 " + (viewMode === "phone" ? "max-w-md shadow-2xl border-x border-purple-500/20 bg-black/20" : "max-w-7xl")}>
 
               {/* TAB 1: OVERVIEW */}
               {activeTab === "home" && (
@@ -1286,49 +1387,49 @@
                       <span className="text-amber-300">✨</span> Official Fresher's Extravaganza • Oct 16, 10:00 AM
                     </div>
 
-                    <h1 className="font-heading text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-md">
+                    <h1 className="font-heading text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-md break-words">
                       <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
                     </h1>
 
-                    <p className="text-lg sm:text-2xl text-purple-200 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm">
+                    <p className="text-base sm:text-2xl text-purple-200 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2">
                       <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
                     </p>
 
                     {/* Real-Time Countdown to Oct 16, 10:00 AM */}
-                    <div className="pt-4 grid grid-cols-4 gap-3 sm:gap-5 max-w-xl mx-auto">
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-purple-400/40 bg-purple-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-purple-200">{timeLeft.days}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-purple-300 mt-1">Days</div>
+                    <div className="pt-2 sm:pt-4 grid grid-cols-4 gap-2 sm:gap-5 max-w-xl mx-auto">
+                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-purple-400/40 bg-purple-950/50 shadow-2xl">
+                        <div className="font-heading text-2xl sm:text-5xl font-black text-purple-200">{timeLeft.days}</div>
+                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-purple-300 mt-0.5 sm:mt-1">Days</div>
                       </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-pink-400/40 bg-pink-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-pink-200">{timeLeft.hours}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-pink-300 mt-1">Hours</div>
+                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-pink-400/40 bg-pink-950/50 shadow-2xl">
+                        <div className="font-heading text-2xl sm:text-5xl font-black text-pink-200">{timeLeft.hours}</div>
+                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-pink-300 mt-0.5 sm:mt-1">Hours</div>
                       </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-indigo-400/40 bg-indigo-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-indigo-200">{timeLeft.mins}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-indigo-300 mt-1">Minutes</div>
+                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-indigo-400/40 bg-indigo-950/50 shadow-2xl">
+                        <div className="font-heading text-2xl sm:text-5xl font-black text-indigo-200">{timeLeft.mins}</div>
+                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-indigo-300 mt-0.5 sm:mt-1">Mins</div>
                       </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-amber-400/40 bg-amber-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-amber-300 mt-1">Seconds</div>
+                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-amber-400/40 bg-amber-950/50 shadow-2xl">
+                        <div className="font-heading text-2xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
+                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-amber-300 mt-0.5 sm:mt-1">Secs</div>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="pt-4 flex flex-wrap justify-center items-center gap-4">
+                    <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 max-w-lg sm:max-w-none mx-auto">
                       <button 
                         onClick={triggerConfetti}
-                        className="px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-base shadow-2xl shadow-purple-600/50 transition-all transform hover:scale-105 flex items-center gap-2 border border-purple-300/30">
+                        className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-2xl shadow-purple-600/50 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-purple-300/30">
                         <span>🎊</span> Celebrate & Cheer!
                       </button>
                       <button 
                         onClick={() => setActiveTab("schedule")}
-                        className="px-6 py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-sm text-purple-100 border border-purple-400/30 transition-all">
+                        className="px-5 sm:px-6 py-3 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-xs sm:text-sm text-purple-100 border border-purple-400/30 transition-all text-center">
                         View Run of Show (41 Segments) →
                       </button>
                       <button 
                         onClick={() => setActiveTab("members")}
-                        className="px-6 py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-sm text-amber-300 border border-amber-400/30 transition-all">
+                        className="px-5 sm:px-6 py-3 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-xs sm:text-sm text-amber-300 border border-amber-400/30 transition-all text-center">
                         Department Committee (38 Members) →
                       </button>
                     </div>
@@ -1492,28 +1593,28 @@
                           </div>
 
                           {/* Right: Duration + Editor Controls */}
-                          <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end pt-1 sm:pt-0 border-t sm:border-t-0 border-purple-500/10">
                             {showDurations && (row.min || editEnabled) && (
-                              <span className="text-xs px-2.5 py-1 rounded-xl glass-card border border-purple-400/40 text-purple-200 font-bold whitespace-nowrap shadow-sm">
+                              <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-xl glass-card border border-purple-400/40 text-purple-200 font-bold whitespace-nowrap shadow-sm">
                                 <Ed v={row.min} on={editEnabled} ph="Duration" label="Duration" set={(val) => updateData(d => { d.rows[idx].min = val; return d; }, "Updated duration")} />
                               </span>
                             )}
 
                             {editEnabled && (
-                              <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-purple-500/30">
+                              <div className="flex flex-wrap items-center gap-1 bg-black/60 p-1 rounded-xl border border-purple-500/30">
                                 <select 
                                   value={row.type} 
                                   onChange={e => updateData(d => { d.rows[idx].type = e.target.value; return d; }, "Changed act category")}
-                                  className="glass-card text-[11px] text-purple-200 font-bold border border-purple-400/40 rounded-lg px-2 py-1 focus:outline-none"
+                                  className="glass-card text-[10px] sm:text-[11px] text-purple-200 font-bold border border-purple-400/40 rounded-lg px-1.5 py-0.5 focus:outline-none max-w-[110px]"
                                   title="Change Type">
                                   {ROW_CATEGORIES.map(c => <option key={c.id} value={c.id} className="bg-gray-950 text-white">{c.label}</option>)}
                                 </select>
-                                <button onClick={() => moveRow(idx, -1)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Up">↑</button>
-                                <button onClick={() => moveRow(idx, 1)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Down">↓</button>
-                                <button onClick={() => duplicateRow(idx)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-emerald-300 font-bold" title="Duplicate Row">＋</button>
+                                <button onClick={() => moveRow(idx, -1)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Up">↑</button>
+                                <button onClick={() => moveRow(idx, 1)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Down">↓</button>
+                                <button onClick={() => duplicateRow(idx)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-emerald-300 font-bold" title="Duplicate Row">＋</button>
                                 <button 
                                   onClick={() => removeRow(idx)} 
-                                  className="px-2 py-1 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all" 
+                                  className="px-1.5 py-0.5 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all" 
                                   title="Remove this Row">
                                   🗑️
                                 </button>
@@ -1681,7 +1782,54 @@
                             </span>
                           </div>
 
-                          <div className="overflow-x-auto">
+                          {/* Mobile Cards View (Visible on Phone/Small screens) */}
+                          <div className={(viewMode === "desktop" ? "hidden" : "block md:hidden") + " space-y-2.5"}>
+                            {deptMembers.map((m, mIdx) => {
+                              const isMissingRoll = m.rollNo === "NOT FOUND";
+                              return (
+                                <div key={m.id || mIdx} className="glass-card p-3 rounded-2xl border border-purple-500/20 space-y-2">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-6 h-6 rounded-lg bg-purple-900/60 text-purple-200 text-xs font-bold flex items-center justify-center border border-purple-400/40 shrink-0">
+                                        {mIdx + 1}
+                                      </span>
+                                      <span className="font-bold text-white text-base">
+                                        <Ed v={m.name} on={editEnabled} ph="Name" label="Member Name" set={(val) => editMemberField(m.id, "name", val)} />
+                                      </span>
+                                    </div>
+                                    {editEnabled && (
+                                      <button 
+                                        onClick={() => removeMember(m.id, m.name)}
+                                        className="p-1.5 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all"
+                                        title="Delete Member">
+                                        🗑️
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-purple-500/10 text-xs">
+                                    <span className={"px-2.5 py-0.5 rounded-lg text-[11px] font-bold border " + getLeadBadgeStyle(m.role, dept)}>
+                                      <Ed v={m.role} on={editEnabled} ph="Role" label="Member Role" set={(val) => editMemberField(m.id, "role", val)} />
+                                    </span>
+                                    <div>
+                                      {isMissingRoll ? (
+                                        <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/50 inline-flex items-center gap-1">
+                                          <span>⚠️</span>
+                                          <Ed v={m.rollNo} on={editEnabled} ph="Roll No" label="Roll Number" set={(val) => editMemberField(m.id, "rollNo", val)} />
+                                        </span>
+                                      ) : (
+                                        <span className="font-mono text-xs font-semibold text-gray-300">
+                                          <Ed v={m.rollNo} on={editEnabled} ph="Roll No" label="Roll Number" set={(val) => editMemberField(m.id, "rollNo", val)} />
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Desktop Table View */}
+                          <div className={(viewMode === "phone" ? "hidden" : "hidden md:block") + " overflow-x-auto"}>
                             <table className="w-full text-left text-sm">
                               <thead className="bg-purple-950/70 text-purple-200 text-xs uppercase border-b border-purple-500/20 font-heading tracking-wider">
                                 <tr>
@@ -1875,9 +2023,79 @@
                     </div>
                   </div>
 
-                  {/* User Table */}
+                  {/* User Table / Mobile Cards */}
                   <div className="glass-card rounded-3xl overflow-hidden border-2 border-purple-500/30 shadow-2xl">
-                    <div className="overflow-x-auto">
+                    {/* Mobile Cards (Phone View) */}
+                    <div className={(viewMode === "desktop" ? "hidden" : "block md:hidden") + " divide-y divide-purple-500/20"}>
+                      {filteredUsers.map(u => {
+                        const isMaster = u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+                        const regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "System Default";
+
+                        return (
+                          <div key={u.id || u.email} className="p-4 space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <div className="font-bold text-white flex items-center gap-1.5">
+                                  <span>{u.name || u.email.split("@")[0]}</span>
+                                  {isMaster && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/50 font-black">SUPER ADMIN</span>}
+                                </div>
+                                <div className="text-xs text-purple-300 font-mono flex items-center gap-1.5 mt-0.5">
+                                  <span className="truncate max-w-[200px]">{u.email}</span>
+                                  <button 
+                                    onClick={() => { navigator.clipboard.writeText(u.email); notify(`Copied ${u.email}`); }}
+                                    className="text-[10px] text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-white/5"
+                                    title="Copy email">
+                                    📋
+                                  </button>
+                                </div>
+                              </div>
+                              <span className={"px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 " + (isMaster ? "bg-red-500/20 text-red-200 border border-red-400/50" : u.canEdit ? "bg-emerald-500/20 text-emerald-200 border border-emerald-400/50" : "bg-purple-500/20 text-purple-200")}>
+                                {isMaster ? "👑 Admin" : u.canEdit ? "✏️ Editor" : "🎉 Attendee"}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-300 pt-1 border-t border-purple-500/10">
+                              <span className="px-2 py-0.5 rounded-md text-[11px] bg-gray-900/80 text-gray-300 border border-gray-700">
+                                {u.device || "Web Browser"}
+                              </span>
+                              <span className="text-[11px] text-gray-400">{regDate}</span>
+                            </div>
+
+                            {/* Editing Rights & Delete controls */}
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-purple-500/10">
+                              <div>
+                                {isMaster ? (
+                                  <span className="text-xs text-amber-300 font-bold italic">Full Master Rights</span>
+                                ) : (
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                      type="checkbox" 
+                                      checked={!!u.canEdit}
+                                      onChange={e => toggleUserEditRights(u.email, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-10 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    <span className={"ml-2 text-xs font-bold " + (u.canEdit ? "text-emerald-300" : "text-gray-400")}>
+                                      {u.canEdit ? "Can Edit" : "Viewer"}
+                                    </span>
+                                  </label>
+                                )}
+                              </div>
+                              {!isMaster && (
+                                <button 
+                                  onClick={() => deleteUser(u.email)} 
+                                  className="text-xs text-red-300 hover:text-white px-2.5 py-1 rounded-xl border border-red-500/40 bg-red-950/40 hover:bg-red-900 transition-all font-bold">
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className={(viewMode === "phone" ? "hidden" : "hidden md:block") + " overflow-x-auto"}>
                       <table className="w-full text-left text-sm">
                         <thead className="bg-purple-950/80 text-purple-200 text-xs uppercase border-b border-purple-500/30 font-heading tracking-wider">
                           <tr>
@@ -1968,7 +2186,7 @@
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-purple-500/20 py-8 px-4 text-center text-xs text-purple-200 mt-auto bg-black/40">
+            <footer className="border-t border-purple-500/20 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-purple-200 mt-auto bg-black/40">
               <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-medium">
                 <div>
                   © 2026 Freshers Welcome • October 16, 2026 • 10:00 AM
@@ -1978,6 +2196,42 @@
                 </div>
               </div>
             </footer>
+
+            {/* Mobile Bottom Navigation Bar (Dock) */}
+            <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " fixed bottom-0 left-0 right-0 z-40 bg-[#0e081c]/95 backdrop-blur-lg border-t border-purple-500/30 px-2 py-2 flex items-center justify-around shadow-2xl"}>
+              <button 
+                onClick={() => setActiveTab("home")} 
+                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "home" ? "text-white font-extrabold" : "text-gray-400 hover:text-gray-200")}>
+                <span className="text-lg">🏠</span>
+                <span className="text-[10px]">Home</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("schedule")} 
+                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "schedule" ? "text-purple-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
+                <span className="text-lg">📋</span>
+                <span className="text-[10px]">Itinerary</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("members")} 
+                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "members" ? "text-pink-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
+                <span className="text-lg">👥</span>
+                <span className="text-[10px]">Committee</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("team")} 
+                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "team" ? "text-amber-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
+                <span className="text-lg">🎤</span>
+                <span className="text-[10px]">Anchors</span>
+              </button>
+              {isSuperAdmin && (
+                <button 
+                  onClick={() => setActiveTab("admin")} 
+                  className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "admin" ? "text-red-400 font-extrabold" : "text-amber-300/70 hover:text-amber-300")}>
+                  <span className="text-lg">👑</span>
+                  <span className="text-[10px]">Admin</span>
+                </button>
+              )}
+            </div>
 
             {/* MODAL: CLOUD SYNC & DATABASE CONFIGURATION */}
             {cloudConfigModal && (
