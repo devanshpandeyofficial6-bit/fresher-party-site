@@ -1002,6 +1002,33 @@
           } catch (e) {}
         };
 
+        const sanitizeItinerary = (itin) => {
+          if (!itin) return DEFAULT_DATA;
+          const copy = JSON.parse(JSON.stringify(itin));
+          if (!copy.title || copy.title === "Freshers 2026") copy.title = "Freshers 2026-27";
+          if (!copy.anchors || copy.anchors.length > 4 || copy.anchors.some(a => a.names && a.names.includes("Shivanand"))) {
+            copy.anchors = DEFAULT_DATA.anchors;
+            copy.rows = DEFAULT_DATA.rows;
+          }
+          return copy;
+        };
+
+        const sanitizeMembers = (memList) => {
+          if (!memList || !Array.isArray(memList)) return DEFAULT_MEMBERS;
+          const copy = JSON.parse(JSON.stringify(memList));
+          copy.forEach(m => {
+            if (m.name && (m.name.includes("Shivanand") || m.name.includes("Anvesha"))) {
+              if (m.department === "Anchors") m.department = "Rampwalk";
+              if (m.role && m.role.toLowerCase().includes("anchor")) m.role = "Member";
+            }
+            if (m.name && m.name.toLowerCase().includes("riya jain")) {
+              m.department = "Choreography";
+              m.role = "Choreography Lead";
+            }
+          });
+          return copy;
+        };
+
         // Tier 1: Firebase Realtime Database (Real-time global sync across all devices)
         const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
         if (customUrl) {
@@ -1027,12 +1054,14 @@
                   });
                 }
                 if (remote.itinerary) {
-                  setData(remote.itinerary);
-                  localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+                  const cleanItin = sanitizeItinerary(remote.itinerary);
+                  setData(cleanItin);
+                  localStorage.setItem("fresher_party_data_v9", JSON.stringify(cleanItin));
                 }
                 if (remote.members) {
-                  setMembers(remote.members);
-                  localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
+                  const cleanMem = sanitizeMembers(remote.members);
+                  setMembers(cleanMem);
+                  localStorage.setItem("fresher_committee_members_v4", JSON.stringify(cleanMem));
                 }
               }
               setCloudStatus("connected");
@@ -1065,12 +1094,14 @@
               });
             }
             if (remote.itinerary) {
-              setData(remote.itinerary);
-              localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+              const cleanItin = sanitizeItinerary(remote.itinerary);
+              setData(cleanItin);
+              localStorage.setItem("fresher_party_data_v9", JSON.stringify(cleanItin));
             }
             if (remote.members) {
-              setMembers(remote.members);
-              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(remote.members));
+              const cleanMem = sanitizeMembers(remote.members);
+              setMembers(cleanMem);
+              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(cleanMem));
             }
             setCloudStatus("server");
             setLastSyncTime(new Date());
