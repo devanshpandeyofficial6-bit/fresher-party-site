@@ -567,6 +567,7 @@
     }, {});
 
     // Department List
+    // Department List
     const DEFAULT_DEPARTMENTS = [
       "Technical Department",
       "Video & Photography Department",
@@ -575,6 +576,7 @@
       "Anchors",
       "Rampwalk",
       "Fillers",
+      "Choreography",
       "Art & Craft"
     ];
 
@@ -597,20 +599,22 @@
       { id: "m14", department: "Disciplinary & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
       { id: "m15", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
       { id: "m16", department: "Disciplinary & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
-      { id: "m17", department: "Anchors", role: "Anchor", name: "Devansh Pandey", rollNo: "2500461520057" },
-      { id: "m18", department: "Anchors", role: "Anchor", name: "Riya Jain", rollNo: "2500460100148" },
-      { id: "m19", department: "Anchors", role: "Anchor", name: "Rudraksha Sharma", rollNo: "2500460100154" },
-      { id: "m20", department: "Anchors", role: "Anchor", name: "Yashi Srivastava", rollNo: "2500460100208" },
-      { id: "m21", department: "Rampwalk", role: "Lead / Anchor", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
-      { id: "m22", department: "Rampwalk", role: "Lead / Anchor", name: "Aakriti Srivastava", rollNo: "2500461520001" },
-      { id: "m23", department: "Rampwalk", role: "Lead / Anchor", name: "Shivanand Pal", rollNo: "2500461520147" },
-      { id: "m24", department: "Rampwalk", role: "Anchor", name: "Anvesha Chaudhary", rollNo: "2500461520036" },
-      { id: "m25", department: "Fillers", role: "Filler", name: "Rohit Kumar", rollNo: "2500460100151" },
-      { id: "m26", department: "Fillers", role: "Filler", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m17", department: "Anchors", role: "Anchor (Squad A)", name: "Devansh Pandey", rollNo: "2500461520057" },
+      { id: "m18", department: "Anchors", role: "Anchor (Squad A)", name: "Riya Jain", rollNo: "2500460100148" },
+      { id: "m19", department: "Anchors", role: "Anchor (Squad B)", name: "Rudraksha Sharma", rollNo: "2500460100154" },
+      { id: "m20", department: "Anchors", role: "Anchor (Squad B)", name: "Yashi Srivastava", rollNo: "2500460100208" },
+      { id: "m25a", department: "Anchors", role: "Anchor / Filler (Squad C)", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m26a", department: "Anchors", role: "Anchor / Filler (Squad C)", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m21", department: "Rampwalk", role: "Ramp Lead / Anchor (Squad D)", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
+      { id: "m22", department: "Rampwalk", role: "Ramp Lead / Anchor (Squad D)", name: "Aakriti Srivastava", rollNo: "2500461520001" },
+      { id: "m23", department: "Rampwalk", role: "Member", name: "Shivanand Pal", rollNo: "2500461520147" },
+      { id: "m24", department: "Rampwalk", role: "Member", name: "Anvesha Chaudhary", rollNo: "2500461520036" },
+      { id: "m25", department: "Fillers", role: "Filler Lead", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m26", department: "Fillers", role: "Filler Lead", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
       { id: "m27", department: "Fillers", role: "Filler", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
       { id: "m28", department: "Fillers", role: "Filler", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
-      { id: "m29", department: "Art & Craft", role: "Lead / Member", name: "Riya Jain", rollNo: "2500460100148" },
-      { id: "m30", department: "Art & Craft", role: "Lead / Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
+      { id: "m29", department: "Choreography", role: "Choreography Lead", name: "Riya Jain", rollNo: "2500460100148" },
+      { id: "m30", department: "Art & Craft", role: "Art & Craft Lead", name: "Bhoomi Gupta", rollNo: "2500460100066" },
       { id: "m31", department: "Art & Craft", role: "Member", name: "Lavanya Verma", rollNo: "250046010101" },
       { id: "m32", department: "Art & Craft", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
       { id: "m33", department: "Art & Craft", role: "Member", name: "Ayush Shukla", rollNo: "2503491530043" },
@@ -630,11 +634,10 @@
       when: "Friday, October 16, 2026 • 10:00 AM Onwards",
       targetDate: "2026-10-16T10:00",
       anchors: [
-        { k: "a", title: "A · Anchoring", names: "Devansh Pandey + Riya Jain" },
-        { k: "b", title: "B · Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
-        { k: "c", title: "C · Anchoring (Fillers)", names: "Shivanand Pal + Anvesha Chaudary" },
-        { k: "d", title: "D · Ramp Walk Anchoring", names: "Vaibhav Jauhari + Aakriti Srivastava" },
-        { k: "e", title: "E · Fillers", names: "Rohit Kumar & Mayank Vishwakarma" }
+        { k: "a", title: "A · Opening & Main Anchoring", names: "Devansh Pandey + Riya Jain" },
+        { k: "b", title: "B · Main Stage Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
+        { k: "c", title: "C · Fillers & Stage Anchoring", names: "Rohit Kumar & Mayank Vishwakarma" },
+        { k: "d", title: "D · Ramp Walk Anchoring", names: "Vaibhav Jauhari + Aakriti Srivastava" }
       ],
       rows: [
         { type: "anc", title: "Anchor A Opening", who: "Devansh Pandey + Riya Jain", min: "2 MIN" },
@@ -647,18 +650,18 @@
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
         { type: "anc", title: "Anchor A Link", who: "Anchors A", min: "2 MIN" },
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
-        { type: "anc", title: "Anchors A + E + D Interaction", who: "Anchors A + E + D", min: "5+2 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 1", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "anc", title: "Anchors A + C + D Interaction", who: "Anchors A + C + D", min: "5+2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 1", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchor D Link", who: "Anchor D", min: "1 MIN" },
         { type: "sing", title: "SOLO SINGING", who: "Tanishq", min: "4 MIN" },
         { type: "anc", title: "Anchor D Link", who: "Anchor D", min: "1 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 2", who: "Freshers Batch • Anchors D + C", min: "" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 2", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
         { type: "dance", title: "DUET DANCE", who: "Rudraksha + Devansh", min: "" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
         { type: "skit", title: "SKIT (2ND & 1ST YEAR)", who: "2nd & 1st Year Crew", min: "10 MIN" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 3", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 3", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
         { type: "dance", title: "GROUP DANCE", who: "2nd Year: Riya Jain & Rudraksha Sharma", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
@@ -669,13 +672,13 @@
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
-        { type: "ramp", title: "RAMP ROUND - 4", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "ramp", title: "RAMP ROUND - 4", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchors A + B", who: "Anchors A & B", min: "" },
         { type: "fin", title: "Miss & Mr Fresher Announcement", who: "Anchors A + B + Dignitaries", min: "" },
         { type: "anc", title: "Anchors A + B Link", who: "Anchors A & B", min: "" },
         { type: "fin", title: "Behind The Scenes (BTS) Video", who: "Media & Tech Team", min: "" },
         { type: "fin", title: "Thank You to All Members", who: "Organizing Committee", min: "" },
-        { type: "anc", title: "All Anchors (A + B + C + D + E)", who: "All Anchor Squads", min: "" },
+        { type: "anc", title: "All Anchors (A + B + C + D)", who: "All Anchor Squads (A, B, C, D)", min: "" },
         { type: "fin", title: "Batch Distribution", who: "All Anchors & Seniors", min: "" },
         { type: "dj", title: "🔥 DJ & Dining Buffet", who: "Open for Everyone", min: "Unlimited" }
       ]
@@ -745,6 +748,10 @@
             if (parsed.title === "Freshers 2026" || !parsed.title) {
               parsed.title = "Freshers 2026-27";
             }
+            if (parsed.anchors && (parsed.anchors.length > 4 || parsed.anchors.some(a => a.names && a.names.includes("Shivanand")))) {
+              parsed.anchors = DEFAULT_DATA.anchors;
+              parsed.rows = DEFAULT_DATA.rows;
+            }
             return parsed;
           }
           return DEFAULT_DATA;
@@ -757,7 +764,16 @@
       const [members, setMembers] = useState(() => {
         try {
           const saved = localStorage.getItem("fresher_committee_members_v4");
-          return saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
+          if (saved) {
+            const list = JSON.parse(saved);
+            const riya = list.find(m => m.name && m.name.toLowerCase().includes("riya jain") && m.department === "Art & Craft");
+            if (riya) {
+              riya.department = "Choreography";
+              riya.role = "Choreography Lead";
+            }
+            return list;
+          }
+          return DEFAULT_MEMBERS;
         } catch (e) {
           return DEFAULT_MEMBERS;
         }
@@ -2221,7 +2237,7 @@
                             <div className="min-w-0">
                               <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 block">MS. FRESHER</span>
                               <h4 className="text-lg sm:text-xl font-black text-white truncate">Riya Jain</h4>
-                              <p className="text-xs text-amber-200/80 font-medium mt-0.5">Art &amp; Craft Lead • Anchor</p>
+                              <p className="text-xs text-amber-200/80 font-medium mt-0.5">Choreography Lead • Anchor</p>
                             </div>
                           </div>
                         </TiltCard>
