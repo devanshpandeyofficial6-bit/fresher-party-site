@@ -63,11 +63,11 @@
     /* Keyframe Animations */
     @keyframes partyFloat {
       0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
+      50% { transform: translateY(-4px); }
     }
     @keyframes auraPulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 0.9; transform: scale(1.06); }
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.04); }
     }
     @keyframes barDance {
       0%, 100% { height: 4px; }
@@ -76,6 +76,55 @@
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
+    }
+
+    /* Radio Wave / Radar Sonar Ripple Effect */
+    .radio-waves-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      max-width: 900px;
+      max-height: 480px;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radio-wave {
+      position: absolute;
+      border-radius: 9999px;
+      border: 1.5px solid rgba(236, 72, 153, 0.45);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.25), inset 0 0 15px rgba(236, 72, 153, 0.15);
+      animation: radioWavePulse 4.5s cubic-bezier(0.15, 0.65, 0.35, 1) infinite;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .radio-wave:nth-child(1) { animation-delay: 0s; }
+    .radio-wave:nth-child(2) { animation-delay: 0.9s; border-color: rgba(168, 85, 247, 0.4); }
+    .radio-wave:nth-child(3) { animation-delay: 1.8s; border-color: rgba(245, 158, 11, 0.35); }
+    .radio-wave:nth-child(4) { animation-delay: 2.7s; border-color: rgba(236, 72, 153, 0.3); }
+    .radio-wave:nth-child(5) { animation-delay: 3.6s; border-color: rgba(59, 130, 246, 0.35); }
+
+    @keyframes radioWavePulse {
+      0% {
+        width: 40px;
+        height: 40px;
+        opacity: 0.95;
+        transform: scale(0.4);
+      }
+      40% {
+        opacity: 0.6;
+      }
+      100% {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transform: scale(1.1);
+      }
     }
 
     /* Sound Equalizer Bars */
@@ -573,9 +622,9 @@
 
     // Complete 41-Item Official Itinerary
     const DEFAULT_DATA = {
-      title: "Freshers 2026",
+      title: "Freshers 2026-27",
       sub: "Official Run of Show, Organizing Committee & Performance Schedule",
-      about: "Welcome to Freshers 2026! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
+      about: "Welcome to Freshers 2026-27! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
       contact: "Management Lead: DEVANSH PANDEY (+91 9794130719)",
       venue: "Main Auditorium, Campus Arena • Block B",
       when: "Friday, October 16, 2026 • 10:00 AM Onwards",
@@ -691,7 +740,14 @@
       const [data, setData] = useState(() => {
         try {
           const saved = localStorage.getItem("fresher_party_data_v9");
-          return saved ? JSON.parse(saved) : DEFAULT_DATA;
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.title === "Freshers 2026" || !parsed.title) {
+              parsed.title = "Freshers 2026-27";
+            }
+            return parsed;
+          }
+          return DEFAULT_DATA;
         } catch (e) {
           return DEFAULT_DATA;
         }
@@ -1464,7 +1520,7 @@
             
             {/* Toast Notification */}
             {toastMsg && (
-              <div className="fixed bottom-6 right-6 z-50 glass-card px-6 py-3.5 rounded-2xl border-2 border-purple-400 bg-purple-950/95 text-white shadow-2xl flex items-center gap-3 animate-bounce">
+              <div className="fixed bottom-6 right-6 z-50 glass-card px-6 py-3.5 rounded-2xl border-2 border-purple-400/80 bg-[#0e0720]/95 text-white shadow-[0_10px_35px_rgba(168,85,247,0.35)] flex items-center gap-3 transition-all duration-300">
                 <span className="text-2xl">✨</span>
                 <span className="text-sm font-bold tracking-wide">{toastMsg}</span>
               </div>
@@ -1706,14 +1762,26 @@
                       <span className="text-white font-extrabold">October 16, 2026</span>
                     </div>
 
-                    {/* Electric Concert Headline */}
-                    <h1 className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-[0.98] fest-title-gradient break-words max-w-5xl mx-auto">
-                      <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
-                    </h1>
+                    {/* Relative Title Wrapper with Concentric Radio Wave Sonar Effect */}
+                    <div className="relative py-8 my-2 flex flex-col items-center justify-center">
+                      {/* Concentric Radio Waves / Radar Sonar Rings Effect */}
+                      <div className="radio-waves-container" aria-hidden="true">
+                        <div className="radio-wave"></div>
+                        <div className="radio-wave"></div>
+                        <div className="radio-wave"></div>
+                        <div className="radio-wave"></div>
+                        <div className="radio-wave"></div>
+                      </div>
 
-                    <p className="text-base sm:text-2xl text-purple-100 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2">
-                      <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
-                    </p>
+                      {/* Electric Concert Headline */}
+                      <h1 className="relative z-10 font-heading text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-[0.98] fest-title-gradient break-words max-w-5xl mx-auto select-none">
+                        <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
+                      </h1>
+
+                      <p className="relative z-10 text-base sm:text-2xl text-purple-100 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2 mt-4">
+                        <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
+                      </p>
+                    </div>
 
                     {/* Glowing Festival Countdown with 3D Tilt */}
                     <TiltCard maxTilt={5} className="pt-2 max-w-2xl mx-auto w-full">
@@ -1743,7 +1811,7 @@
                               <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-indigo-300 mt-1">Minutes</div>
                             </div>
                             <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-amber-400/50 bg-amber-950/40 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
-                              <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300 animate-pulse">{timeLeft.secs}</div>
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
                               <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300 mt-1">Seconds</div>
                             </div>
                           </div>
