@@ -45,67 +45,133 @@
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #090612;
+      background-color: #080512;
       background-image: 
-        radial-gradient(ellipse 70% 55% at 10% 5%, rgba(120, 40, 200, 0.18) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 45% at 88% 25%, rgba(220, 60, 140, 0.13) 0%, transparent 45%),
-        radial-gradient(ellipse 60% 40% at 55% 85%, rgba(40, 100, 220, 0.11) 0%, transparent 50%);
+        radial-gradient(ellipse 65% 50% at 20% 10%, rgba(147, 51, 234, 0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 25%, rgba(236, 72, 153, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 50% 85%, rgba(79, 70, 229, 0.20) 0%, transparent 60%),
+        radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 40%);
       background-attachment: fixed;
-      color: #f1f0f5;
+      color: #f8fafc;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Keyframe Animations */
+    @keyframes partyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes auraPulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.06); }
+    }
+    @keyframes barDance {
+      0%, 100% { height: 4px; }
+      50% { height: 18px; }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* Sound Equalizer Bars */
+    .eq-bar {
+      display: inline-block;
+      width: 3px;
+      border-radius: 9999px;
+      background: linear-gradient(to top, #ec4899, #a855f7, #fbbf24);
+      animation: barDance 1.1s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.8s; }
+    .eq-bar:nth-child(2) { animation-delay: 0.3s; animation-duration: 1.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.15s; animation-duration: 0.7s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.4s; animation-duration: 1.0s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.2s; animation-duration: 0.9s; }
+
+    /* Festival Gradient Titles */
+    .fest-title-gradient {
+      background: linear-gradient(135deg, #ffffff 10%, #fef08a 35%, #f472b6 65%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 25px rgba(236, 72, 153, 0.35));
+    }
+    .gold-title-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #fde047 40%, #f59e0b 80%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 18px rgba(245, 158, 11, 0.4));
     }
 
     /* Glass Panels */
     .glass-nav {
-      background: rgba(11, 7, 22, 0.93);
+      background: rgba(10, 6, 20, 0.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(150, 80, 240, 0.18);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.22);
     }
     .glass-card {
-      background: rgba(18, 12, 32, 0.85);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 80, 220, 0.2);
-      box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.55);
+      background: rgba(18, 11, 34, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
     }
     .glass-card:hover {
-      border-color: rgba(180, 120, 255, 0.35);
+      border-color: rgba(236, 72, 153, 0.4);
+      box-shadow: 0 12px 35px -8px rgba(168, 85, 247, 0.25);
     }
 
-    /* Accent-border cards — left bar style, for info blocks */
+    /* Festive Event Attraction Card */
+    .fest-feature-card {
+      background: linear-gradient(145deg, rgba(28, 16, 50, 0.8) 0%, rgba(14, 8, 28, 0.9) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 1.25rem;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .fest-feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(236, 72, 153, 0.5);
+      box-shadow: 0 16px 36px -10px rgba(236, 72, 153, 0.3);
+    }
+
+    /* Accent-border cards */
     .accent-card {
-      background: rgba(18, 12, 32, 0.75);
+      background: rgba(18, 11, 34, 0.85);
       border-left: 3px solid;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      border-right: 1px solid rgba(255,255,255,0.04);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 6px 24px -6px rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 8px 26px -6px rgba(0, 0, 0, 0.55);
     }
 
     /* Schedule row — tighter, content-first */
     .sched-row {
-      background: rgba(16, 10, 28, 0.80);
-      border: 1px solid rgba(120, 60, 200, 0.18);
-      transition: border-color 0.18s, background 0.18s;
+      background: rgba(16, 10, 30, 0.85);
+      border: 1px solid rgba(147, 51, 234, 0.20);
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
     }
     .sched-row:hover {
-      background: rgba(24, 14, 42, 0.9);
-      border-color: rgba(160, 100, 240, 0.35);
+      background: rgba(26, 15, 48, 0.95);
+      border-color: rgba(192, 132, 252, 0.45);
+      transform: translateX(2px);
     }
     .sched-row-dj {
-      background: linear-gradient(135deg, rgba(130, 20, 100, 0.45) 0%, rgba(60, 10, 90, 0.6) 100%);
-      border: 1px solid rgba(240, 80, 180, 0.45);
-      box-shadow: 0 0 24px -8px rgba(220, 60, 160, 0.35);
+      background: linear-gradient(135deg, rgba(147, 24, 110, 0.5) 0%, rgba(68, 12, 100, 0.7) 100%);
+      border: 1px solid rgba(244, 114, 182, 0.55);
+      box-shadow: 0 0 30px -5px rgba(236, 72, 153, 0.4);
     }
     .sched-row-slot {
-      background: rgba(10, 35, 25, 0.6);
-      border: 1px dashed rgba(52, 200, 120, 0.3);
+      background: rgba(12, 38, 28, 0.65);
+      border: 1px dashed rgba(52, 211, 153, 0.4);
     }
 
     /* Subtle divider line */
     .rule-line {
       height: 1px;
-      background: linear-gradient(90deg, transparent 0%, rgba(150, 80, 220, 0.3) 30%, rgba(200, 80, 160, 0.2) 70%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.4) 30%, rgba(236, 72, 153, 0.35) 70%, transparent 100%);
       border: none;
     }
 
@@ -1420,89 +1486,163 @@
                 <div className="space-y-12">
                   
                   {/* Hero Section */}
-                  <section className="text-center py-8 sm:py-12 px-3 relative space-y-6">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 text-xs font-semibold backdrop-blur-md">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <span>Fresher's Welcome 2026</span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-amber-300 font-bold">Oct 16, 10:00 AM</span>
+                  <section className="text-center py-8 sm:py-14 px-3 relative space-y-6">
+                    {/* Live Festival Soundwave Pill */}
+                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 border border-purple-400/50 text-xs font-bold text-white shadow-[0_0_20px_rgba(236,72,153,0.25)]">
+                      <div className="flex items-center gap-1">
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                      </div>
+                      <span className="uppercase tracking-widest text-[11px] text-amber-300 font-extrabold">The Biggest Welcome Festival</span>
+                      <span className="text-purple-300/60">•</span>
+                      <span className="text-white font-extrabold">October 16, 2026</span>
                     </div>
 
-                    <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] text-white break-words max-w-4xl mx-auto">
+                    {/* Electric Concert Headline */}
+                    <h1 className="font-heading text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-[0.98] fest-title-gradient break-words max-w-5xl mx-auto">
                       <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
                     </h1>
 
-                    <p className="text-base sm:text-xl text-slate-300/90 max-w-2xl mx-auto font-normal leading-relaxed px-2">
+                    <p className="text-base sm:text-2xl text-purple-100 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2">
                       <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
                     </p>
 
-                    {/* Cohesive Editorial Countdown Widget */}
-                    <div className="pt-2 max-w-lg mx-auto w-full">
-                      <div className="glass-card rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl bg-gradient-to-b from-white/[0.03] to-black/30">
-                        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 text-center flex items-center justify-center gap-1.5">
-                          <span>⏳</span> Countdown to Stage Launch
-                        </div>
-                        <div className="grid grid-cols-4 divide-x divide-white/10 text-center">
-                          <div className="px-1 sm:px-2">
-                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.days}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Days</div>
+                    {/* Glowing Festival Countdown */}
+                    <div className="pt-2 max-w-2xl mx-auto w-full">
+                      <div className="relative p-1 rounded-3xl bg-gradient-to-r from-purple-500/40 via-pink-500/40 to-amber-500/40 shadow-[0_0_35px_rgba(168,85,247,0.3)]">
+                        <div className="bg-[#0e0720]/95 backdrop-blur-2xl rounded-[22px] p-4 sm:p-6 space-y-3">
+                          <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold uppercase tracking-widest px-2">
+                            <span className="text-pink-400 flex items-center gap-1.5">
+                              <span className="animate-ping w-2 h-2 rounded-full bg-pink-400"></span>
+                              Stage Countdown
+                            </span>
+                            <span className="text-amber-300 font-extrabold flex items-center gap-1">
+                              <span>📍</span> Main Campus Auditorium
+                            </span>
                           </div>
-                          <div className="px-1 sm:px-2">
-                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.hours}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Hours</div>
-                          </div>
-                          <div className="px-1 sm:px-2">
-                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.mins}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Mins</div>
-                          </div>
-                          <div className="px-1 sm:px-2">
-                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-amber-300 tracking-tight">{timeLeft.secs}</div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300/80 mt-0.5">Secs</div>
+
+                          <div className="grid grid-cols-4 gap-2 sm:gap-4 text-center">
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-purple-400/40 bg-purple-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.days}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-purple-300 mt-1">Days</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-pink-400/40 bg-pink-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.hours}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-pink-300 mt-1">Hours</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-indigo-400/40 bg-indigo-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.mins}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-indigo-300 mt-1">Minutes</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-amber-400/50 bg-amber-950/40 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300 animate-pulse">{timeLeft.secs}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300 mt-1">Seconds</div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Action Buttons with clear visual hierarchy */}
-                    <div className="pt-2 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-2.5 sm:gap-3.5 max-w-xl mx-auto">
+                    {/* Celebration Action Buttons */}
+                    <div className="pt-2 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 max-w-xl mx-auto">
                       <button 
                         onClick={triggerConfetti}
-                        className="px-6 sm:px-7 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 active:scale-95">
-                        <span>🎉</span> Celebrate & Cheer!
+                        className="px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-[0_0_30px_rgba(236,72,153,0.45)] transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 border border-pink-300/40">
+                        <span className="text-xl">🎊</span>
+                        <span>Blast Confetti & Celebrate!</span>
                       </button>
                       <button 
                         onClick={() => setActiveTab("schedule")}
-                        className="px-5 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] font-semibold text-xs sm:text-sm text-slate-200 border border-white/10 transition-all text-center">
-                        Itinerary & Acts (41) →
+                        className="px-6 py-3.5 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-extrabold text-xs sm:text-sm text-purple-200 border border-purple-400/40 hover:border-purple-300 transition-all text-center">
+                        📋 Run of Show (41 Acts) →
                       </button>
                       <button 
                         onClick={() => setActiveTab("members")}
-                        className="px-5 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] font-semibold text-xs sm:text-sm text-amber-300 border border-amber-400/25 transition-all text-center">
-                        Committee Roster (38) →
+                        className="px-6 py-3.5 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-extrabold text-xs sm:text-sm text-amber-300 border border-amber-400/40 hover:border-amber-300 transition-all text-center">
+                        👑 Royal Spotlight →
                       </button>
+                    </div>
+                  </section>
+
+                  {/* 4 Big Party Experience Highlights */}
+                  <section className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-heading text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                        <span>✨</span> What's In Store For You
+                      </h2>
+                      <span className="text-xs text-purple-300 font-bold uppercase tracking-wider">Party Lineup</span>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Highlight 1: DJ Night */}
+                      <div className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center text-2xl">
+                          🎧
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">Electric DJ Jam</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Non-stop EDM, Bollywood bangers & laser soundscape on the massive dance floor.
+                        </p>
+                      </div>
+
+                      {/* Highlight 2: Ramp Walk */}
+                      <div className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl">
+                          👑
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">Runway & Crowning</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Mr. & Ms. Fresher ramp walk rounds, glamour walk & the official crown ceremony.
+                        </p>
+                      </div>
+
+                      {/* Highlight 3: 41 Live Acts */}
+                      <div className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-2xl">
+                          🎤
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">41 Curated Stage Acts</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Power-packed solo songs, acoustic jams, dramatic skits & energetic dance battles.
+                        </p>
+                      </div>
+
+                      {/* Highlight 4: Feast & Booths */}
+                      <div className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl">
+                          🍽️
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">Feast & Photo Booth</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Multi-course festive dining, mocktail refreshments & instant photo memories.
+                        </p>
+                      </div>
                     </div>
                   </section>
 
                   {/* Venue, Timing & Management Accent Cards */}
                   <section className="grid md:grid-cols-3 gap-5">
-                    <div className="accent-card border-l-amber-400 p-6 rounded-2xl space-y-2.5">
+                    <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-amber-400">
                       <div className="flex items-center gap-2 text-amber-400">
-                        <span className="text-lg">📍</span>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400/90">Auditorium & Venue</span>
+                        <span className="text-xl">📍</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">Auditorium & Venue</span>
                       </div>
-                      <h3 className="font-heading text-lg font-bold text-white">Event Location</h3>
-                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                      <h3 className="font-heading text-lg font-black text-white">Event Location</h3>
+                      <p className="text-sm text-purple-100 leading-relaxed font-medium">
                         <Ed v={data.venue} on={editEnabled} ph="Venue Details" label="Venue" set={(val) => updateData(d => { d.venue = val; return d; }, "Updated venue")} />
                       </p>
                     </div>
 
-                    <div className="accent-card border-l-purple-400 p-6 rounded-2xl space-y-2.5">
-                      <div className="flex items-center gap-2 text-purple-300">
-                        <span className="text-lg">🗓️</span>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300/90">Date & Schedule</span>
+                    <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-pink-400">
+                      <div className="flex items-center gap-2 text-pink-400">
+                        <span className="text-xl">🗓️</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-pink-300">Date & Schedule</span>
                       </div>
-                      <h3 className="font-heading text-lg font-bold text-white">Day & Reporting</h3>
-                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                      <h3 className="font-heading text-lg font-black text-white">Day & Reporting</h3>
+                      <p className="text-sm text-purple-100 leading-relaxed font-medium">
                         <Ed v={data.when} on={editEnabled} ph="Date and Timing" label="Date/Time" set={(val) => updateData(d => { d.when = val; return d; }, "Updated timing")} />
                       </p>
                       {editEnabled && (
@@ -1518,33 +1658,32 @@
                       )}
                     </div>
 
-                    <div className="accent-card border-l-emerald-400 p-6 rounded-2xl space-y-2.5">
-                      <div className="flex items-center gap-2 text-emerald-300">
-                        <span className="text-lg">📞</span>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300/90">Management Desk</span>
+                    <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-emerald-400">
+                      <div className="flex items-center gap-2 text-emerald-400">
+                        <span className="text-xl">📞</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Management Desk</span>
                       </div>
-                      <h3 className="font-heading text-lg font-bold text-white">Coordination & Inquiries</h3>
-                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                      <h3 className="font-heading text-lg font-black text-white">Coordination & Inquiries</h3>
+                      <p className="text-sm text-purple-100 leading-relaxed font-medium">
                         <Ed v={data.contact} on={editEnabled} ph="Contact info" label="Contact" set={(val) => updateData(d => { d.contact = val; return d; }, "Updated contact info")} />
                       </p>
                     </div>
                   </section>
 
                   {/* About the Celebration */}
-                  <section className="glass-card p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 space-y-3 relative overflow-hidden bg-gradient-to-r from-purple-950/20 via-transparent to-indigo-950/20">
-                    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-bold tracking-widest">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                      About The Celebration
+                  <section className="glass-card p-6 sm:p-8 rounded-3xl border border-purple-400/30 space-y-3 relative overflow-hidden bg-gradient-to-r from-purple-950/40 via-pink-950/20 to-indigo-950/40 shadow-xl">
+                    <div className="flex items-center gap-2 text-amber-300 text-xs uppercase font-extrabold tracking-widest">
+                      <span>🎉</span> The Fresher's Experience
                     </div>
-                    <h2 className="font-heading text-xl sm:text-2xl font-bold text-white">
+                    <h2 className="font-heading text-xl sm:text-2xl font-black text-white">
                       Welcome to the Next Chapter
                     </h2>
-                    <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal max-w-4xl">
+                    <p className="text-purple-100 text-sm sm:text-base leading-relaxed font-normal max-w-4xl">
                       <Ed v={data.about} on={editEnabled} ph="About description" label="About details" set={(val) => updateData(d => { d.about = val; return d; }, "Updated about info")} />
                     </p>
-                    <div className="pt-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-400 border-t border-white/10">
+                    <div className="pt-3 flex flex-wrap items-center gap-4 text-xs font-extrabold text-purple-200 border-t border-purple-500/20">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-purple-300">✦</span> 41 Curated Stage Acts
+                        <span className="text-amber-300">✦</span> 41 Curated Stage Acts
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-pink-300">✦</span> 38 Organizing Members
@@ -1553,7 +1692,7 @@
                         <span className="text-emerald-300">✦</span> 8 Specialized Teams
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-amber-300">✦</span> Ramp Walk & DJ Finale
+                        <span className="text-yellow-300">✦</span> Runway & DJ Finale
                       </div>
                     </div>
                   </section>
@@ -1761,43 +1900,46 @@
                   </div>
 
                   {/* MR. & MS. FRESHERS 2025-26 ROYAL SPOTLIGHT */}
-                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-amber-400/30 bg-gradient-to-b from-amber-500/[0.08] via-black/40 to-black/60 backdrop-blur-xl shadow-2xl">
+                  <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-amber-400/50 bg-gradient-to-br from-amber-500/20 via-purple-950/40 to-black/80 backdrop-blur-xl shadow-[0_0_40px_rgba(245,158,11,0.25)]">
+                    <div className="absolute -top-20 -right-20 w-56 h-56 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute -bottom-20 -left-20 w-56 h-56 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
                     <div className="relative z-10 flex flex-col items-center text-center space-y-4">
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-300/30 text-amber-200 text-xs font-semibold tracking-wider uppercase">
-                        <span>👑</span> The Crown Spotlight <span>👑</span>
+                      <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-black tracking-widest uppercase shadow-md">
+                        <span>👑</span> The Royal Court Spotlight <span>👑</span>
                       </div>
 
                       <div>
-                        <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
-                          MR. &amp; MS. FRESHERS <span className="text-amber-300 font-black">2025–26</span>
+                        <h3 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight gold-title-gradient">
+                          MR. &amp; MS. FRESHERS 2025–26
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-lg mx-auto font-normal">
-                          Leading the celebration with charisma, style &amp; festive elegance
+                        <p className="text-xs sm:text-sm text-amber-200/90 mt-1 max-w-lg mx-auto font-medium">
+                          Leading the celebration with charisma, royalty, runway grace &amp; festive elegance
                         </p>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl pt-2">
                         {/* Devansh Pandey - Mr Fresher */}
-                        <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-amber-400/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all flex items-center gap-4 text-left">
-                          <div className="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-xl font-bold text-amber-300 shrink-0">
+                        <div className="glass-card p-4 sm:p-5 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-b from-amber-500/10 to-black/60 hover:border-amber-400/70 transition-all flex items-center gap-4 text-left shadow-lg">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-2xl font-black text-gray-950 shadow-md shadow-amber-400/40 shrink-0">
                             👑
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 block">MR. FRESHER</span>
-                            <h4 className="text-base sm:text-lg font-bold text-white truncate">Devansh Pandey</h4>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">Management Lead • Anchor</p>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 block">MR. FRESHER</span>
+                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Devansh Pandey</h4>
+                            <p className="text-xs text-amber-200/80 font-medium mt-0.5">Management Lead • Anchor</p>
                           </div>
                         </div>
 
                         {/* Riya Jain - Ms Fresher */}
-                        <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-amber-400/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all flex items-center gap-4 text-left">
-                          <div className="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-xl font-bold text-amber-300 shrink-0">
+                        <div className="glass-card p-4 sm:p-5 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-b from-amber-500/10 to-black/60 hover:border-amber-400/70 transition-all flex items-center gap-4 text-left shadow-lg">
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-300 to-amber-500 flex items-center justify-center text-2xl font-black text-gray-950 shadow-md shadow-amber-400/40 shrink-0">
                             ✨
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 block">MS. FRESHER</span>
-                            <h4 className="text-base sm:text-lg font-bold text-white truncate">Riya Jain</h4>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">Art &amp; Craft Lead • Anchor</p>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 block">MS. FRESHER</span>
+                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Riya Jain</h4>
+                            <p className="text-xs text-amber-200/80 font-medium mt-0.5">Art &amp; Craft Lead • Anchor</p>
                           </div>
                         </div>
                       </div>
