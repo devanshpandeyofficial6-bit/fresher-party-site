@@ -45,31 +45,68 @@
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #0b0714;
+      background-color: #090612;
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.22) 0%, transparent 45%),
-        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.18) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.16) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 55% at 10% 5%, rgba(120, 40, 200, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 45% at 88% 25%, rgba(220, 60, 140, 0.13) 0%, transparent 45%),
+        radial-gradient(ellipse 60% 40% at 55% 85%, rgba(40, 100, 220, 0.11) 0%, transparent 50%);
       background-attachment: fixed;
-      color: #f8fafc;
+      color: #f1f0f5;
       min-height: 100vh;
     }
 
     /* Glass Panels */
     .glass-nav {
-      background: rgba(15, 10, 26, 0.92);
+      background: rgba(11, 7, 22, 0.93);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(168, 85, 247, 0.25);
+      border-bottom: 1px solid rgba(150, 80, 240, 0.18);
     }
     .glass-card {
-      background: rgba(22, 15, 38, 0.88);
+      background: rgba(18, 12, 32, 0.85);
       backdrop-filter: blur(14px);
-      border: 1px solid rgba(168, 85, 247, 0.25);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(148, 80, 220, 0.2);
+      box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.55);
     }
     .glass-card:hover {
-      border-color: rgba(192, 132, 252, 0.45);
+      border-color: rgba(180, 120, 255, 0.35);
+    }
+
+    /* Accent-border cards — left bar style, for info blocks */
+    .accent-card {
+      background: rgba(18, 12, 32, 0.75);
+      border-left: 3px solid;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 6px 24px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Schedule row — tighter, content-first */
+    .sched-row {
+      background: rgba(16, 10, 28, 0.80);
+      border: 1px solid rgba(120, 60, 200, 0.18);
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .sched-row:hover {
+      background: rgba(24, 14, 42, 0.9);
+      border-color: rgba(160, 100, 240, 0.35);
+    }
+    .sched-row-dj {
+      background: linear-gradient(135deg, rgba(130, 20, 100, 0.45) 0%, rgba(60, 10, 90, 0.6) 100%);
+      border: 1px solid rgba(240, 80, 180, 0.45);
+      box-shadow: 0 0 24px -8px rgba(220, 60, 160, 0.35);
+    }
+    .sched-row-slot {
+      background: rgba(10, 35, 25, 0.6);
+      border: 1px dashed rgba(52, 200, 120, 0.3);
+    }
+
+    /* Subtle divider line */
+    .rule-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(150, 80, 220, 0.3) 30%, rgba(200, 80, 160, 0.2) 70%, transparent 100%);
+      border: none;
     }
 
     /* Live In-place Text Editing */
@@ -196,15 +233,15 @@
 
     // Supported Performance / Row Categories
     const ROW_CATEGORIES = [
-      { id: "perf", label: "Performance", badge: "bg-purple-500/25 text-purple-200 border-purple-400/40" },
-      { id: "dance", label: "Dance Performance", badge: "bg-pink-500/25 text-pink-200 border-pink-400/40" },
-      { id: "sing", label: "Singing", badge: "bg-cyan-500/25 text-cyan-200 border-cyan-400/40" },
-      { id: "skit", label: "Skit / Drama", badge: "bg-blue-500/25 text-blue-200 border-blue-400/40" },
-      { id: "ramp", label: "Ramp Walk Round", badge: "bg-amber-500/25 text-amber-200 border-amber-400/40" },
-      { id: "anc", label: "Anchor Link", badge: "bg-rose-500/25 text-rose-200 border-rose-400/40" },
-      { id: "slot", label: "Open Slot", badge: "bg-emerald-500/25 text-emerald-200 border-emerald-400/40" },
-      { id: "fin", label: "Finale / Award", badge: "bg-yellow-500/25 text-yellow-200 border-yellow-400/40" },
-      { id: "dj", label: "DJ & Dining", badge: "bg-gradient-to-r from-pink-600/30 to-purple-600/30 text-white border-pink-400/50" }
+      { id: "perf", label: "Performance", badge: "bg-purple-500/15 text-purple-200 border-purple-500/30" },
+      { id: "dance", label: "Dance Performance", badge: "bg-pink-500/15 text-pink-200 border-pink-500/30" },
+      { id: "sing", label: "Singing", badge: "bg-sky-500/15 text-sky-200 border-sky-500/30" },
+      { id: "skit", label: "Skit / Drama", badge: "bg-indigo-500/15 text-indigo-200 border-indigo-500/30" },
+      { id: "ramp", label: "Ramp Walk Round", badge: "bg-amber-500/15 text-amber-200 border-amber-500/30" },
+      { id: "anc", label: "Anchor Link", badge: "bg-rose-500/15 text-rose-200 border-rose-500/30" },
+      { id: "slot", label: "Open Slot", badge: "bg-emerald-500/15 text-emerald-200 border-emerald-500/30" },
+      { id: "fin", label: "Finale / Award", badge: "bg-yellow-500/15 text-yellow-200 border-yellow-500/40 font-semibold" },
+      { id: "dj", label: "DJ & Dining", badge: "bg-gradient-to-r from-pink-500/20 to-purple-500/25 text-pink-200 border-pink-400/40 font-bold" }
     ];
 
     const TYPES_MAP = ROW_CATEGORIES.reduce((acc, curr) => {
@@ -1167,46 +1204,47 @@
               <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
                 
                 {/* Logo & Title */}
-                <div className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none min-w-0" onClick={() => setActiveTab("home")}>
-                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 flex items-center justify-center text-xl sm:text-2xl shadow-lg shadow-purple-500/40 border border-purple-300/40 shrink-0">
-                    🎉
+                <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none min-w-0" onClick={() => setActiveTab("home")}>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-600/20 border border-purple-400/30 flex items-center justify-center text-lg sm:text-xl shadow-inner shrink-0">
+                    ✨
                   </div>
                   <div className="min-w-0">
-                    <div className="font-heading font-black text-lg sm:text-2xl tracking-tight bg-gradient-to-r from-purple-300 via-pink-300 to-amber-200 bg-clip-text text-transparent truncate leading-tight">
-                      Freshers 2026
+                    <div className="font-heading font-black text-lg sm:text-xl tracking-tight text-white flex items-center gap-1.5 leading-tight">
+                      <span>Freshers</span>
+                      <span className="text-amber-300 font-extrabold text-xs px-1.5 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20">2026</span>
                     </div>
-                    <div className="text-[9px] sm:text-[11px] font-extrabold uppercase tracking-widest text-purple-300 -mt-0.5 truncate">
-                      Oct 16 • 10:00 AM
+                    <div className="text-[10px] sm:text-[11px] font-semibold text-slate-400 tracking-wide truncate">
+                      Thursday, Oct 16 • 10:00 AM
                     </div>
                   </div>
                 </div>
 
                 {/* Desktop Nav Tabs */}
-                <nav className={(viewMode === "phone" ? "hidden" : "hidden md:flex") + " items-center gap-1 bg-black/40 p-1.5 rounded-2xl border border-purple-500/20"}>
+                <nav className={(viewMode === "phone" ? "hidden" : "hidden md:flex") + " items-center gap-1 bg-white/[0.04] p-1 rounded-xl border border-white/10"}>
                   <button 
                     onClick={() => setActiveTab("home")} 
-                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "home" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "home" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Overview
                   </button>
                   <button 
                     onClick={() => setActiveTab("schedule")} 
-                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "schedule" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Itinerary & Acts
                   </button>
                   <button 
                     onClick={() => setActiveTab("members")} 
-                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     <span>👥</span> Committee
                   </button>
                   <button 
                     onClick={() => setActiveTab("team")} 
-                    className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all " + (activeTab === "team" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "team" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Anchor Squad
                   </button>
                   {isSuperAdmin && (
                     <button 
                       onClick={() => setActiveTab("admin")} 
-                      className={"px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/40" : "text-amber-300 hover:bg-amber-500/15 border border-amber-500/30")}>
+                      className={"px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-amber-400 text-gray-950 shadow-sm" : "text-amber-300 hover:bg-amber-400/10")}>
                       <span>👑</span> Admin
                     </button>
                   )}
@@ -1382,82 +1420,94 @@
                 <div className="space-y-12">
                   
                   {/* Hero Section */}
-                  <section className="text-center py-10 px-4 relative space-y-6">
-                    <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-card border border-purple-400/40 text-purple-200 text-xs md:text-sm font-bold shadow-lg">
-                      <span className="text-amber-300">✨</span> Official Fresher's Extravaganza • Oct 16, 10:00 AM
+                  <section className="text-center py-8 sm:py-12 px-3 relative space-y-6">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 text-xs font-semibold backdrop-blur-md">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span>Fresher's Welcome 2026</span>
+                      <span className="text-slate-500">•</span>
+                      <span className="text-amber-300 font-bold">Oct 16, 10:00 AM</span>
                     </div>
 
-                    <h1 className="font-heading text-4xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-md break-words">
+                    <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] text-white break-words max-w-4xl mx-auto">
                       <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
                     </h1>
 
-                    <p className="text-base sm:text-2xl text-purple-200 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2">
+                    <p className="text-base sm:text-xl text-slate-300/90 max-w-2xl mx-auto font-normal leading-relaxed px-2">
                       <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
                     </p>
 
-                    {/* Real-Time Countdown to Oct 16, 10:00 AM */}
-                    <div className="pt-2 sm:pt-4 grid grid-cols-4 gap-2 sm:gap-5 max-w-xl mx-auto">
-                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-purple-400/40 bg-purple-950/50 shadow-2xl">
-                        <div className="font-heading text-2xl sm:text-5xl font-black text-purple-200">{timeLeft.days}</div>
-                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-purple-300 mt-0.5 sm:mt-1">Days</div>
-                      </div>
-                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-pink-400/40 bg-pink-950/50 shadow-2xl">
-                        <div className="font-heading text-2xl sm:text-5xl font-black text-pink-200">{timeLeft.hours}</div>
-                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-pink-300 mt-0.5 sm:mt-1">Hours</div>
-                      </div>
-                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-indigo-400/40 bg-indigo-950/50 shadow-2xl">
-                        <div className="font-heading text-2xl sm:text-5xl font-black text-indigo-200">{timeLeft.mins}</div>
-                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-indigo-300 mt-0.5 sm:mt-1">Mins</div>
-                      </div>
-                      <div className="glass-card p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center border border-amber-400/40 bg-amber-950/50 shadow-2xl">
-                        <div className="font-heading text-2xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
-                        <div className="text-[9px] sm:text-[11px] uppercase font-black tracking-widest text-amber-300 mt-0.5 sm:mt-1">Secs</div>
+                    {/* Cohesive Editorial Countdown Widget */}
+                    <div className="pt-2 max-w-lg mx-auto w-full">
+                      <div className="glass-card rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl bg-gradient-to-b from-white/[0.03] to-black/30">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 text-center flex items-center justify-center gap-1.5">
+                          <span>⏳</span> Countdown to Stage Launch
+                        </div>
+                        <div className="grid grid-cols-4 divide-x divide-white/10 text-center">
+                          <div className="px-1 sm:px-2">
+                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.days}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Days</div>
+                          </div>
+                          <div className="px-1 sm:px-2">
+                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.hours}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Hours</div>
+                          </div>
+                          <div className="px-1 sm:px-2">
+                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-white tracking-tight">{timeLeft.mins}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">Mins</div>
+                          </div>
+                          <div className="px-1 sm:px-2">
+                            <div className="font-heading text-2xl sm:text-4xl font-extrabold text-amber-300 tracking-tight">{timeLeft.secs}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-300/80 mt-0.5">Secs</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 max-w-lg sm:max-w-none mx-auto">
+                    {/* Action Buttons with clear visual hierarchy */}
+                    <div className="pt-2 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-2.5 sm:gap-3.5 max-w-xl mx-auto">
                       <button 
                         onClick={triggerConfetti}
-                        className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-2xl shadow-purple-600/50 transition-all transform hover:scale-105 flex items-center justify-center gap-2 border border-purple-300/30">
-                        <span>🎊</span> Celebrate & Cheer!
+                        className="px-6 sm:px-7 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span>🎉</span> Celebrate & Cheer!
                       </button>
                       <button 
                         onClick={() => setActiveTab("schedule")}
-                        className="px-5 sm:px-6 py-3 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-xs sm:text-sm text-purple-100 border border-purple-400/30 transition-all text-center">
-                        View Run of Show (41 Segments) →
+                        className="px-5 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] font-semibold text-xs sm:text-sm text-slate-200 border border-white/10 transition-all text-center">
+                        Itinerary & Acts (41) →
                       </button>
                       <button 
                         onClick={() => setActiveTab("members")}
-                        className="px-5 sm:px-6 py-3 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-xs sm:text-sm text-amber-300 border border-amber-400/30 transition-all text-center">
-                        Department Committee (38 Members) →
+                        className="px-5 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] font-semibold text-xs sm:text-sm text-amber-300 border border-amber-400/25 transition-all text-center">
+                        Committee Roster (38) →
                       </button>
                     </div>
                   </section>
 
-                  {/* Venue, Timing & Contact Cards */}
-                  <section className="grid md:grid-cols-3 gap-6">
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-purple-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-purple-500/25 border border-purple-400/40 flex items-center justify-center text-2xl">
-                        📍
+                  {/* Venue, Timing & Management Accent Cards */}
+                  <section className="grid md:grid-cols-3 gap-5">
+                    <div className="accent-card border-l-amber-400 p-6 rounded-2xl space-y-2.5">
+                      <div className="flex items-center gap-2 text-amber-400">
+                        <span className="text-lg">📍</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400/90">Auditorium & Venue</span>
                       </div>
-                      <h3 className="font-heading text-xl font-black text-white">Auditorium & Venue</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
+                      <h3 className="font-heading text-lg font-bold text-white">Event Location</h3>
+                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
                         <Ed v={data.venue} on={editEnabled} ph="Venue Details" label="Venue" set={(val) => updateData(d => { d.venue = val; return d; }, "Updated venue")} />
                       </p>
                     </div>
 
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-pink-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-pink-500/25 border border-pink-400/40 flex items-center justify-center text-2xl">
-                        🗓️
+                    <div className="accent-card border-l-purple-400 p-6 rounded-2xl space-y-2.5">
+                      <div className="flex items-center gap-2 text-purple-300">
+                        <span className="text-lg">🗓️</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300/90">Date & Schedule</span>
                       </div>
-                      <h3 className="font-heading text-xl font-black text-white">Date & Timing</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
+                      <h3 className="font-heading text-lg font-bold text-white">Day & Reporting</h3>
+                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
                         <Ed v={data.when} on={editEnabled} ph="Date and Timing" label="Date/Time" set={(val) => updateData(d => { d.when = val; return d; }, "Updated timing")} />
                       </p>
                       {editEnabled && (
                         <div className="pt-2 text-xs">
-                          <label className="text-amber-300 font-bold block mb-1">Update Target Date for Countdown:</label>
+                          <label className="text-amber-300 font-bold block mb-1">Target Date for Countdown:</label>
                           <input 
                             type="datetime-local" 
                             value={data.targetDate || "2026-10-16T10:00"} 
@@ -1468,25 +1518,44 @@
                       )}
                     </div>
 
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-indigo-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/25 border border-indigo-400/40 flex items-center justify-center text-2xl">
-                        📞
+                    <div className="accent-card border-l-emerald-400 p-6 rounded-2xl space-y-2.5">
+                      <div className="flex items-center gap-2 text-emerald-300">
+                        <span className="text-lg">📞</span>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300/90">Management Desk</span>
                       </div>
-                      <h3 className="font-heading text-xl font-black text-white">Management & Contact</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
+                      <h3 className="font-heading text-lg font-bold text-white">Coordination & Inquiries</h3>
+                      <p className="text-sm text-slate-300 leading-relaxed font-normal">
                         <Ed v={data.contact} on={editEnabled} ph="Contact info" label="Contact" set={(val) => updateData(d => { d.contact = val; return d; }, "Updated contact info")} />
                       </p>
                     </div>
                   </section>
 
                   {/* About the Celebration */}
-                  <section className="glass-card p-8 rounded-3xl border border-purple-500/30 space-y-4">
-                    <h2 className="font-heading text-2xl font-black text-white flex items-center gap-2">
-                      <span className="text-amber-300">✨</span> About Freshers 2026
+                  <section className="glass-card p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 space-y-3 relative overflow-hidden bg-gradient-to-r from-purple-950/20 via-transparent to-indigo-950/20">
+                    <div className="flex items-center gap-2 text-slate-400 text-xs uppercase font-bold tracking-widest">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                      About The Celebration
+                    </div>
+                    <h2 className="font-heading text-xl sm:text-2xl font-bold text-white">
+                      Welcome to the Next Chapter
                     </h2>
-                    <p className="text-gray-200 text-base leading-relaxed font-normal">
+                    <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal max-w-4xl">
                       <Ed v={data.about} on={editEnabled} ph="About description" label="About details" set={(val) => updateData(d => { d.about = val; return d; }, "Updated about info")} />
                     </p>
+                    <div className="pt-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-400 border-t border-white/10">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-purple-300">✦</span> 41 Curated Stage Acts
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-pink-300">✦</span> 38 Organizing Members
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-emerald-300">✦</span> 8 Specialized Teams
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-amber-300">✦</span> Ramp Walk & DJ Finale
+                      </div>
+                    </div>
                   </section>
                 </div>
               )}
@@ -1537,11 +1606,11 @@
                   </div>
 
                   {/* Category Filter Pills */}
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-bold">
-                    <span className="text-gray-400 mr-1 shrink-0">Filter:</span>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-semibold">
+                    <span className="text-slate-400 mr-1 shrink-0 text-[11px] font-bold uppercase tracking-wider">Filter:</span>
                     <button 
                       onClick={() => setSelectedCategoryFilter("all")}
-                      className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedCategoryFilter === "all" ? "bg-purple-600 text-white shadow-md shadow-purple-600/40" : "glass-card text-gray-300 hover:text-white")}>
+                      className={"px-3.5 py-1.5 rounded-xl transition-all shrink-0 text-xs font-bold " + (selectedCategoryFilter === "all" ? "bg-white text-gray-950 shadow-md shadow-white/10" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                       All Segments ({data.rows.length})
                     </button>
                     {ROW_CATEGORIES.map(cat => {
@@ -1551,52 +1620,66 @@
                         <button 
                           key={cat.id}
                           onClick={() => setSelectedCategoryFilter(cat.id)}
-                          className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 " + (selectedCategoryFilter === cat.id ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                          className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 text-xs font-semibold " + (selectedCategoryFilter === cat.id ? "bg-purple-600 text-white shadow-md shadow-purple-600/30" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                           <span>{cat.label}</span>
-                          <span className="opacity-70 text-[10px]">({count})</span>
+                          <span className="opacity-70 text-[10px] font-mono">({count})</span>
                         </button>
                       );
                     })}
                   </div>
 
                   {/* Schedule List */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {filteredScheduleRows.map((row) => {
                       const idx = row.originalIndex;
                       const badgeClass = getCategoryBadge(row.type);
                       const isSlot = row.type === "slot";
                       const isDJ = row.type === "dj";
+                      const isRamp = row.type === "ramp";
+                      const isFinale = row.type === "fin";
 
                       return (
-                        <div key={idx} className={"glass-card p-3.5 sm:p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:border-purple-400/60 " + (isDJ ? "bg-purple-950/70 border-pink-400 shadow-xl" : isSlot ? "border-dashed border-emerald-500/30 bg-emerald-950/10" : "border-purple-500/25")}>
+                        <div 
+                          key={idx} 
+                          className={"p-3.5 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all " + 
+                            (isDJ ? "sched-row-dj" : 
+                             isSlot ? "sched-row-slot" : 
+                             isRamp ? "sched-row border-l-4 border-l-amber-400" :
+                             isFinale ? "sched-row border-l-4 border-l-yellow-400" :
+                             "sched-row")}>
                           
                           {/* Left: Index + Type Badge + Title & Performers */}
-                          <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
-                            <span className="w-8 h-8 shrink-0 rounded-xl bg-purple-900/60 text-purple-200 font-heading font-black text-xs flex items-center justify-center border border-purple-400/50 shadow-inner">
+                          <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                            <span className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-lg bg-white/[0.06] text-slate-300 font-mono font-bold text-xs flex items-center justify-center border border-white/10">
                               {idx + 1}
                             </span>
 
                             <div className="flex-1 min-w-0 space-y-0.5">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className={"text-[9px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md border " + badgeClass}>
+                                <span className={"text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border " + badgeClass}>
                                   {TYPES_MAP[row.type] || row.type}
                                 </span>
-                                <div className={"font-heading font-extrabold text-sm sm:text-base " + (isSlot ? "text-emerald-300 italic" : "text-white")}>
+                                {isDJ && (
+                                  <span className="text-[9px] uppercase font-extrabold tracking-widest px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                                    ★ Grand Finale
+                                  </span>
+                                )}
+                                <div className={"font-heading font-bold text-sm sm:text-base " + (isSlot ? "text-emerald-300 italic" : "text-white")}>
                                   <Ed v={row.title} on={editEnabled} ph="Act / Item title" label="Row title" set={(val) => updateData(d => { d.rows[idx].title = val; return d; }, "Updated row title")} />
                                 </div>
                               </div>
-                              <div className="text-xs text-gray-300 font-medium">
-                                <span className="text-purple-300 font-semibold">Performers / Team: </span>
+                              <div className="text-xs text-slate-300/90 font-normal flex flex-wrap items-baseline gap-1.5">
+                                <span className="text-slate-400 text-[11px] font-medium">By:</span>
                                 <Ed v={row.who} on={editEnabled} ph="Performers or team names" label="Performers" set={(val) => updateData(d => { d.rows[idx].who = val; return d; }, "Updated performers")} />
                               </div>
                             </div>
                           </div>
 
                           {/* Right: Duration + Editor Controls */}
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end pt-1 sm:pt-0 border-t sm:border-t-0 border-purple-500/10">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end pt-1 sm:pt-0 border-t sm:border-t-0 border-white/10">
                             {showDurations && (row.min || editEnabled) && (
-                              <span className="text-[11px] sm:text-xs px-2.5 py-1 rounded-xl glass-card border border-purple-400/40 text-purple-200 font-bold whitespace-nowrap shadow-sm">
-                                <Ed v={row.min} on={editEnabled} ph="Duration" label="Duration" set={(val) => updateData(d => { d.rows[idx].min = val; return d; }, "Updated duration")} />
+                              <span className="text-[11px] px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 font-semibold whitespace-nowrap">
+                                ⏱ <Ed v={row.min} on={editEnabled} ph="Duration" label="Duration" set={(val) => updateData(d => { d.rows[idx].min = val; return d; }, "Updated duration")} />
                               </span>
                             )}
 
@@ -1677,50 +1760,44 @@
                     </div>
                   </div>
 
-                  {/* MR. & MS. FRESHERS 2025-26 GOLDEN SPOTLIGHT */}
-                  <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border-2 border-amber-400/80 shadow-[0_0_35px_rgba(251,191,36,0.35)] bg-gradient-to-br from-amber-500/20 via-yellow-900/30 to-purple-950/60 backdrop-blur-xl">
-                    {/* Glowing background accents */}
-                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-                    <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-yellow-300/15 rounded-full blur-3xl pointer-events-none"></div>
-
-                    <div className="relative z-10 flex flex-col items-center text-center space-y-5">
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-300/50 shadow-inner">
-                        <span className="text-base animate-pulse">👑</span>
-                        <span className="text-xs font-black uppercase tracking-widest text-amber-200">The Crown Spotlight</span>
-                        <span className="text-base animate-pulse">👑</span>
+                  {/* MR. & MS. FRESHERS 2025-26 ROYAL SPOTLIGHT */}
+                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-amber-400/30 bg-gradient-to-b from-amber-500/[0.08] via-black/40 to-black/60 backdrop-blur-xl shadow-2xl">
+                    <div className="relative z-10 flex flex-col items-center text-center space-y-4">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400/10 border border-amber-300/30 text-amber-200 text-xs font-semibold tracking-wider uppercase">
+                        <span>👑</span> The Crown Spotlight <span>👑</span>
                       </div>
 
                       <div>
-                        <h3 className="font-heading text-2xl sm:text-4xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-100 drop-shadow-[0_2px_12px_rgba(245,158,11,0.5)]">
-                          MR. &amp; MS. FRESHERS 2025-26
+                        <h3 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
+                          MR. &amp; MS. FRESHERS <span className="text-amber-300 font-black">2025–26</span>
                         </h3>
-                        <p className="text-xs sm:text-sm text-amber-200/80 mt-1 max-w-xl mx-auto font-medium">
-                          Leading the celebration with charisma, royalty &amp; festive elegance
+                        <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-lg mx-auto font-normal">
+                          Leading the celebration with charisma, style &amp; festive elegance
                         </p>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-2xl pt-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl pt-2">
                         {/* Devansh Pandey - Mr Fresher */}
-                        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-amber-400/60 bg-gradient-to-b from-amber-500/15 to-black/40 shadow-lg shadow-amber-500/10 flex items-center gap-4 text-left transform hover:scale-[1.02] transition-transform">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-2xl font-black shadow-md shadow-amber-400/40 text-gray-950 shrink-0">
+                        <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-amber-400/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all flex items-center gap-4 text-left">
+                          <div className="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-xl font-bold text-amber-300 shrink-0">
                             👑
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 block">MR. FRESHER 2025-26</span>
-                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Devansh Pandey</h4>
-                            <p className="text-xs text-amber-200/75 font-mono mt-0.5">Management Lead • Anchor</p>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 block">MR. FRESHER</span>
+                            <h4 className="text-base sm:text-lg font-bold text-white truncate">Devansh Pandey</h4>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5">Management Lead • Anchor</p>
                           </div>
                         </div>
 
                         {/* Riya Jain - Ms Fresher */}
-                        <div className="glass-card p-5 sm:p-6 rounded-2xl border-2 border-amber-400/60 bg-gradient-to-b from-amber-500/15 to-black/40 shadow-lg shadow-amber-500/10 flex items-center gap-4 text-left transform hover:scale-[1.02] transition-transform">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-300 to-amber-500 flex items-center justify-center text-2xl font-black shadow-md shadow-amber-400/40 text-gray-950 shrink-0">
+                        <div className="p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-amber-400/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all flex items-center gap-4 text-left">
+                          <div className="w-12 h-12 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-xl font-bold text-amber-300 shrink-0">
                             ✨
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 block">MS. FRESHER 2025-26</span>
-                            <h4 className="text-lg sm:text-xl font-black text-white truncate">Riya Jain</h4>
-                            <p className="text-xs text-amber-200/75 font-mono mt-0.5">Art &amp; Craft Lead • Anchor</p>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400/90 block">MS. FRESHER</span>
+                            <h4 className="text-base sm:text-lg font-bold text-white truncate">Riya Jain</h4>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5">Art &amp; Craft Lead • Anchor</p>
                           </div>
                         </div>
                       </div>
@@ -1728,20 +1805,20 @@
                   </div>
 
                   {/* Search and Department Filter Bar */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                     <input 
                       type="text" 
                       placeholder="Search members by name, roll no, role or department..." 
                       value={memberSearchQuery}
                       onInput={e => setMemberSearchQuery(e.target.value)}
-                      className="w-full sm:w-96 glass-card px-5 py-3 rounded-2xl text-sm border border-purple-400/40 text-white placeholder-gray-400 focus:outline-none focus:border-purple-300 font-medium"
+                      className="w-full sm:w-96 bg-white/[0.04] px-4 py-2.5 rounded-xl text-sm border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 font-medium transition-all"
                     />
 
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-bold">
-                      <span className="text-gray-400 mr-1 shrink-0">Dept:</span>
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+                      <span className="text-slate-400 mr-1 shrink-0 text-[11px] font-bold uppercase tracking-wider">Dept:</span>
                       <button 
                         onClick={() => setSelectedDeptFilter("all")}
-                        className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedDeptFilter === "all" ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                        className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedDeptFilter === "all" ? "bg-white text-gray-950 font-bold shadow-sm" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                         All ({members.length})
                       </button>
                       {allDepartments.map((dept, dIdx) => {
@@ -1750,9 +1827,9 @@
                           <button 
                             key={dIdx}
                             onClick={() => setSelectedDeptFilter(dept)}
-                            className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1 " + (selectedDeptFilter === dept ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                            className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 " + (selectedDeptFilter === dept ? "bg-purple-600 text-white shadow-md shadow-purple-600/30" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                             <span>{dept.replace(" Department", "")}</span>
-                            <span className="opacity-70 text-[10px]">({count})</span>
+                            <span className="opacity-70 text-[10px] font-mono">({count})</span>
                           </button>
                         );
                       })}
@@ -1911,21 +1988,26 @@
               {/* TAB 4: ANCHOR TEAMS */}
               {activeTab === "team" && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="font-heading text-3xl sm:text-4xl font-black text-white">Anchor & Organizing Squads</h2>
-                    <p className="text-sm text-purple-200 mt-1 font-medium">The official stage hosts, fillers, and ramp walk anchoring teams.</p>
+                  <div className="border-b border-white/10 pb-4">
+                    <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-white">Stage Anchors & Hosts</h2>
+                    <p className="text-sm text-slate-300 mt-1 font-normal">The official emcees, stage fillers, and ramp walk hosts leading the show.</p>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {data.anchors.map((team, idx) => (
-                      <div key={idx} className="glass-card p-6 sm:p-7 rounded-3xl border-2 border-purple-500/30 hover:border-purple-400 transition-all space-y-3 shadow-xl">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center font-heading font-black text-white text-xl shadow-md">
-                          {team.k.toUpperCase()}
+                      <div key={idx} className="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 hover:border-purple-400/40 transition-all space-y-3 shadow-lg bg-gradient-to-b from-white/[0.03] to-black/30">
+                        <div className="flex items-center justify-between">
+                          <div className="w-10 h-10 rounded-xl bg-purple-600/15 border border-purple-400/30 flex items-center justify-center text-lg">
+                            🎙️
+                          </div>
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2 py-0.5 rounded bg-white/[0.04] border border-white/5">
+                            Squad #{idx + 1}
+                          </span>
                         </div>
-                        <h3 className="font-heading font-black text-xl text-white">
+                        <h3 className="font-heading font-bold text-lg text-white">
                           <Ed v={team.title} on={editEnabled} ph="Team Title" label="Anchor title" set={(val) => updateData(d => { d.anchors[idx].title = val; return d; }, "Updated anchor team title")} />
                         </h3>
-                        <p className="text-sm text-purple-200 font-semibold leading-relaxed">
+                        <p className="text-sm text-slate-300 font-medium leading-relaxed">
                           <Ed v={team.names} on={editEnabled} ph="Anchor names" label="Anchor names" set={(val) => updateData(d => { d.anchors[idx].names = val; return d; }, "Updated anchor team names")} />
                         </p>
                       </div>
@@ -1937,75 +2019,75 @@
               {/* TAB 5: SUPER ADMIN DASHBOARD */}
               {activeTab === "admin" && isSuperAdmin && (
                 <div className="space-y-8">
-                  <div className="border-b border-purple-500/20 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="border-b border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-2">
-                      <div className="inline-block px-4 py-1.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/40 text-xs font-black uppercase tracking-wider">
-                        👑 Devansh Pandey's Master Command Center
+                      <div className="inline-block px-3.5 py-1 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider">
+                        👑 Admin Command Center
                       </div>
-                      <h2 className="font-heading text-4xl sm:text-5xl font-black text-white">Multi-Device User Registry</h2>
-                      <p className="text-sm text-purple-200 max-w-2xl font-medium">
-                        Live dashboard of every student registered from any device (phones, laptops, tablets). Control editor permissions in 1 click.
+                      <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-white">Attendee & Permissions Registry</h2>
+                      <p className="text-sm text-slate-300 max-w-2xl font-normal">
+                        Real-time directory of students accessing the portal across phones, laptops, and tablets. Toggle editing rights instantly.
                       </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
                       <button 
                         onClick={() => syncWithCloud(true)} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-purple-400/40 hover:border-purple-300 text-xs font-bold text-white flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl glass-card border border-white/10 hover:border-white/20 text-xs font-bold text-white flex items-center gap-1.5 transition-all">
                         <span>🔄</span> {isSyncing ? "Syncing..." : "Sync Now"}
                       </button>
                       <button 
                         onClick={() => setCloudConfigModal(true)} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-cyan-400/40 text-cyan-200 hover:bg-cyan-950/40 text-xs font-bold flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl glass-card border border-cyan-400/30 text-cyan-200 hover:bg-cyan-950/40 text-xs font-bold flex items-center gap-1.5 transition-all">
                         <span>⚙️</span> Cloud Setup
                       </button>
                       <button 
                         onClick={copyAllEmails} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-pink-400/40 text-pink-200 hover:bg-pink-950/40 text-xs font-bold flex items-center gap-2 transition-all">
-                        <span>📋</span> Copy All Emails
+                        className="px-4 py-2 rounded-xl glass-card border border-pink-400/30 text-pink-200 hover:bg-pink-950/40 text-xs font-bold flex items-center gap-1.5 transition-all">
+                        <span>📋</span> Copy Emails
                       </button>
                       <button 
                         onClick={exportAttendeesCSV} 
-                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
                         <span>📥</span> Export CSV
                       </button>
                     </div>
                   </div>
 
                   {/* Cloud Connection Live Banner */}
-                  <div className={"p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 text-xs font-bold " + (cloudStatus === "server" ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : cloudStatus === "connected" ? "bg-cyan-950/40 border-cyan-500/40 text-cyan-200" : "bg-purple-950/40 border-purple-500/40 text-purple-200")}>
+                  <div className={"p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 text-xs font-medium " + (cloudStatus === "server" ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-200" : cloudStatus === "connected" ? "bg-cyan-950/30 border-cyan-500/30 text-cyan-200" : "bg-purple-950/30 border-purple-500/30 text-purple-200")}>
                     <div className="flex items-center gap-2.5">
-                      <span className={"w-3 h-3 rounded-full animate-ping " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
+                      <span className={"w-2.5 h-2.5 rounded-full animate-ping " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
                       <span>
-                        <strong>Live Multi-Device Cloud Status:</strong> {cloudStatus === "server" ? "Node.js Server REST API Active & Connected" : cloudStatus === "connected" ? "Firebase Realtime Cloud Database Connected" : "Local Database Mode (Configure Firebase URL for serverless cross-device cloud sync)"}
+                        <strong className="font-bold text-white">Live Multi-Device Cloud:</strong> {cloudStatus === "server" ? "Connected via Node.js Server REST API" : cloudStatus === "connected" ? "Firebase Realtime Database Connected" : "Local Storage Mode"}
                       </span>
                     </div>
-                    <div className="text-gray-400">
+                    <div className="text-slate-400 text-[11px] font-mono">
                       Last Sync: {lastSyncTime ? lastSyncTime.toLocaleTimeString() : "Just now"}
                     </div>
                   </div>
 
                   {/* Statistics Overview */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="glass-card p-5 rounded-3xl border border-purple-400/40">
-                      <div className="text-xs text-purple-300 uppercase font-black">Total Registered</div>
-                      <div className="font-heading text-4xl font-black text-white mt-1">{users.length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Across all devices</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-transparent">
+                      <div className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Total Registered</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-white mt-1">{users.length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Cross-platform students</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-emerald-400/40">
-                      <div className="text-xs text-emerald-300 uppercase font-black">Active Editors</div>
-                      <div className="font-heading text-4xl font-black text-emerald-300 mt-1">{users.filter(u => u.canEdit).length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Granted edit permissions</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-emerald-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-emerald-400 uppercase font-bold tracking-wider">Active Editors</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-emerald-400 mt-1">{users.filter(u => u.canEdit).length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Authorized to edit live</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-pink-400/40">
-                      <div className="text-xs text-pink-300 uppercase font-black">Attendees</div>
-                      <div className="font-heading text-4xl font-black text-pink-300 mt-1">{users.filter(u => !u.canEdit).length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Students & Viewers</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-purple-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-purple-300 uppercase font-bold tracking-wider">Attendees</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-purple-200 mt-1">{users.filter(u => !u.canEdit).length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Live audience members</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-amber-400/40">
-                      <div className="text-xs text-amber-300 uppercase font-black">Super Admin</div>
-                      <div className="font-heading text-4xl font-black text-amber-300 mt-1">1</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Devansh Pandey</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-amber-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-amber-300 uppercase font-bold tracking-wider">Super Admin</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-amber-300 mt-1">1</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Devansh Pandey</div>
                     </div>
                   </div>
 
@@ -2186,49 +2268,49 @@
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-purple-500/20 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-purple-200 mt-auto bg-black/40">
-              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-medium">
+            <footer className="border-t border-white/10 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-slate-400 mt-auto bg-black/30">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-normal">
                 <div>
                   © 2026 Freshers Welcome • October 16, 2026 • 10:00 AM
                 </div>
-                <div className="text-gray-300">
-                  Management Lead: <strong className="text-white">Devansh Pandey</strong>
+                <div className="text-slate-400">
+                  Management Lead: <strong className="text-white font-medium">Devansh Pandey</strong>
                 </div>
               </div>
             </footer>
 
             {/* Mobile Bottom Navigation Bar (Dock) */}
-            <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " fixed bottom-0 left-0 right-0 z-40 bg-[#0e081c]/95 backdrop-blur-lg border-t border-purple-500/30 px-2 py-2 flex items-center justify-around shadow-2xl"}>
+            <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " fixed bottom-0 left-0 right-0 z-40 bg-[#090612]/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 flex items-center justify-around shadow-2xl"}>
               <button 
                 onClick={() => setActiveTab("home")} 
-                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "home" ? "text-white font-extrabold" : "text-gray-400 hover:text-gray-200")}>
-                <span className="text-lg">🏠</span>
-                <span className="text-[10px]">Home</span>
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "home" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">🏠</span>
+                <span className="text-[10px] tracking-wide">Home</span>
               </button>
               <button 
                 onClick={() => setActiveTab("schedule")} 
-                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "schedule" ? "text-purple-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
-                <span className="text-lg">📋</span>
-                <span className="text-[10px]">Itinerary</span>
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "schedule" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">📋</span>
+                <span className="text-[10px] tracking-wide">Itinerary</span>
               </button>
               <button 
                 onClick={() => setActiveTab("members")} 
-                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "members" ? "text-pink-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
-                <span className="text-lg">👥</span>
-                <span className="text-[10px]">Committee</span>
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "members" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">👥</span>
+                <span className="text-[10px] tracking-wide">Committee</span>
               </button>
               <button 
                 onClick={() => setActiveTab("team")} 
-                className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "team" ? "text-amber-300 font-extrabold" : "text-gray-400 hover:text-gray-200")}>
-                <span className="text-lg">🎤</span>
-                <span className="text-[10px]">Anchors</span>
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "team" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">🎤</span>
+                <span className="text-[10px] tracking-wide">Anchors</span>
               </button>
               {isSuperAdmin && (
                 <button 
                   onClick={() => setActiveTab("admin")} 
-                  className={"flex flex-col items-center gap-1 px-3 py-1 rounded-xl transition-all " + (activeTab === "admin" ? "text-red-400 font-extrabold" : "text-amber-300/70 hover:text-amber-300")}>
-                  <span className="text-lg">👑</span>
-                  <span className="text-[10px]">Admin</span>
+                  className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "admin" ? "text-amber-300 font-bold" : "text-amber-400/60 hover:text-amber-300")}>
+                  <span className="text-base">👑</span>
+                  <span className="text-[10px] tracking-wide">Admin</span>
                 </button>
               )}
             </div>
