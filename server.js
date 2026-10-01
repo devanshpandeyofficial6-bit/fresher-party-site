@@ -273,7 +273,9 @@ try {
         '.json': 'application/json',
         '.png': 'image/png',
         '.jpg': 'image/jpeg',
-        '.svg': 'image/svg+xml'
+        '.svg': 'image/svg+xml',
+        '.wav': 'audio/wav',
+        '.mp3': 'audio/mpeg'
       };
       res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
       fs.createReadStream(filePath).pipe(res);
