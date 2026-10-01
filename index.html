@@ -643,6 +643,13 @@
 
     const DEFAULT_FIREBASE_URL = "https://freshers-c9de2-default-rtdb.firebaseio.com";
 
+    // Official Festival Playlist (Plays on Overview Face)
+    const DEFAULT_PLAYLIST = [
+      { id: 1, title: "Festival Intro Anthem", tag: "EDM Drop", file: "party-anthem.wav", duration: "0:36" },
+      { id: 2, title: "Club Groove Remix", tag: "Dance Beat", file: "party-anthem2.wav", duration: "0:36" },
+      { id: 3, title: "Bhangra Bass Mashup", tag: "High Energy", file: "party-anthem3.wav", duration: "1:19" }
+    ];
+
     // Supported Performance / Row Categories
     const ROW_CATEGORIES = [
       { id: "perf", label: "Performance", badge: "bg-purple-500/15 text-purple-200 border-purple-500/30" },
@@ -726,8 +733,8 @@
       about: "Welcome to Freshers 2026-27! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
       contact: "Management Lead: DEVANSH PANDEY (+91 9794130719)",
       venue: "Main Auditorium, Campus Arena • Block B",
-      when: "Friday, October 16, 2026 • 10:00 AM Onwards",
-      targetDate: "2026-10-16T10:00",
+      when: "Friday, October 16, 2026 • 4:00 PM – 7:00 PM",
+      targetDate: "2026-10-16T16:00",
       anchors: [
         { k: "a", title: "A · Opening & Main Anchoring", names: "Devansh Pandey + Riya Jain" },
         { k: "b", title: "B · Main Stage Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
@@ -848,6 +855,12 @@
             if (parsed.anchors && parsed.anchors.length > 4) {
               parsed.anchors = DEFAULT_DATA.anchors;
             }
+            if (!parsed.when || parsed.when.includes("10:00 AM")) {
+              parsed.when = "Friday, October 16, 2026 • 4:00 PM – 7:00 PM";
+            }
+            if (!parsed.targetDate || parsed.targetDate === "2026-10-16T10:00") {
+              parsed.targetDate = "2026-10-16T16:00";
+            }
             return parsed;
           }
           return DEFAULT_DATA;
@@ -966,10 +979,13 @@
       const hasEditPermission = isSuperAdmin || (currentUser && currentUser.canEdit);
       const lastLocalEditTimeRef = useRef(0);
 
-      // Party Anthem Audio System (Overview face playback)
+      // Party Anthem Playlist System (Overview face playback)
+      const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
       const [isAudioPlaying, setIsAudioPlaying] = useState(false);
       const [userWantsAudio, setUserWantsAudio] = useState(true);
+      const [playlistDrawerOpen, setPlaylistDrawerOpen] = useState(false);
       const audioRef = useRef(null);
+      const currentTrackIndexRef = useRef(0);
 
       const notify = (msg) => {
         setToastMsg(msg);
@@ -1008,6 +1024,8 @@
           if (!itin) return DEFAULT_DATA;
           const copy = JSON.parse(JSON.stringify(itin));
           if (!copy.title || copy.title === "Freshers 2026") copy.title = "Freshers 2026-27";
+          if (!copy.when || copy.when.includes("10:00 AM")) copy.when = "Friday, October 16, 2026 • 4:00 PM – 7:00 PM";
+          if (!copy.targetDate || copy.targetDate === "2026-10-16T10:00") copy.targetDate = "2026-10-16T16:00";
           return copy;
         };
 
@@ -1217,10 +1235,10 @@
         return () => clearInterval(timer);
       }, [syncWithCloud]);
 
-      // Countdown Timer
+      // Countdown Timer towards Oct 16, 4:00 PM
       useEffect(() => {
         const updateCountdown = () => {
-          const target = new Date(data.targetDate || "2026-10-16T10:00").getTime();
+          const target = new Date(data.targetDate || "2026-10-16T16:00").getTime();
           const now = Date.now();
           const diff = Math.max(0, target - now);
 
@@ -1237,17 +1255,61 @@
       }, [data.targetDate]);
 
       // =========================================================================
-      // PARTY ANTHEM AUDIO ENGINE (Overview Face Playback)
+      // PARTY PLAYLIST AUDIO ENGINE (Overview Face Playback)
       // =========================================================================
+      const changeTrack = (newIndex, autoPlay = true) => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        const validIndex = (newIndex + DEFAULT_PLAYLIST.length) % DEFAULT_PLAYLIST.length;
+        setCurrentTrackIndex(validIndex);
+        currentTrackIndexRef.current = validIndex;
+        audio.src = DEFAULT_PLAYLIST[validIndex].file;
+        audio.load();
+        if (autoPlay && userWantsAudio && activeTab === "home") {
+          audio.play().then(() => {
+            setIsAudioPlaying(true);
+            notify(`🎵 Playing: ${DEFAULT_PLAYLIST[validIndex].title}`);
+          }).catch(() => {});
+        }
+      };
+
+      const nextTrack = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        changeTrack(currentTrackIndexRef.current + 1, true);
+      };
+
+      const prevTrack = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        const audio = audioRef.current;
+        if (audio && audio.currentTime > 3) {
+          audio.currentTime = 0;
+        } else {
+          changeTrack(currentTrackIndexRef.current - 1, true);
+        }
+      };
+
       useEffect(() => {
-        const audio = new Audio("party-anthem.wav");
-        audio.loop = true;
+        const audio = new Audio(DEFAULT_PLAYLIST[0].file);
+        audio.loop = false; // We use auto-advance across the playlist
         audio.volume = 0.45;
         audioRef.current = audio;
 
         const onPlay = () => setIsAudioPlaying(true);
         const onPause = () => setIsAudioPlaying(false);
-        const onEnded = () => setIsAudioPlaying(false);
+        const onEnded = () => {
+          // Continuous loop across playlist
+          const nextIdx = (currentTrackIndexRef.current + 1) % DEFAULT_PLAYLIST.length;
+          setCurrentTrackIndex(nextIdx);
+          currentTrackIndexRef.current = nextIdx;
+          audio.src = DEFAULT_PLAYLIST[nextIdx].file;
+          audio.load();
+          audio.play().then(() => {
+            setIsAudioPlaying(true);
+            notify(`🎵 Next Track: ${DEFAULT_PLAYLIST[nextIdx].title}`);
+          }).catch(() => {
+            setIsAudioPlaying(false);
+          });
+        };
 
         audio.addEventListener("play", onPlay);
         audio.addEventListener("pause", onPause);
@@ -1263,7 +1325,7 @@
 
         // First user gesture triggers audio if on Overview face
         const onFirstInteraction = () => {
-          if (audioRef.current && audioRef.current.paused && activeTab === "home") {
+          if (audioRef.current && audioRef.current.paused && activeTab === "home" && userWantsAudio) {
             audioRef.current.play().then(() => {
               setIsAudioPlaying(true);
             }).catch(() => {});
@@ -1319,7 +1381,7 @@
           audio.play().then(() => {
             setIsAudioPlaying(true);
             setUserWantsAudio(true);
-            notify("🎵 Playing Party Anthem (Overview Mode)");
+            notify(`🎵 Playing: ${DEFAULT_PLAYLIST[currentTrackIndexRef.current].title}`);
           }).catch((err) => {
             console.error("Playback error:", err);
           });
@@ -1327,7 +1389,7 @@
           audio.pause();
           setIsAudioPlaying(false);
           setUserWantsAudio(false);
-          notify("⏸ Party Anthem Paused");
+          notify("⏸ Music Paused");
         }
       };
 
@@ -1832,7 +1894,7 @@
                       <span className="text-amber-300 font-extrabold text-xs px-1.5 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20">2026</span>
                     </div>
                     <div className="text-[10px] sm:text-[11px] font-semibold text-slate-400 tracking-wide truncate">
-                      Thursday, Oct 16 • 10:00 AM
+                      Friday, Oct 16 • 4:00 PM – 7:00 PM
                     </div>
                   </div>
                 </div>
@@ -2039,35 +2101,65 @@
                   
                   {/* Hero Section */}
                   <section className="text-center py-8 sm:py-14 px-3 relative space-y-6">
-                    {/* Live Festival Soundwave Pill & Interactive Anthem Toggle */}
-                    <div className="flex flex-wrap items-center justify-center gap-3">
-                      <button 
-                        onClick={toggleAudio}
-                        type="button"
-                        className={"group inline-flex items-center gap-2.5 px-4 py-2 rounded-full border text-xs font-bold transition-all shadow-lg cursor-pointer hover:scale-105 active:scale-95 " + 
-                          (isAudioPlaying 
-                            ? "bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-amber-500/30 border-pink-400/60 text-white shadow-[0_0_25px_rgba(236,72,153,0.35)]" 
-                            : "bg-white/[0.05] border-white/15 text-slate-300 hover:border-purple-400/50 hover:text-white")}
-                        title={isAudioPlaying ? "Click to pause party anthem" : "Click to play party anthem (Plays on Overview)"}>
-                        <div className="flex items-center gap-1">
+                    {/* Live Festival Soundwave Pill & Interactive Playlist Controller */}
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                      <div className={"inline-flex items-center gap-2 sm:gap-3 px-3.5 sm:px-4 py-2 rounded-full border text-xs font-bold transition-all shadow-lg " + 
+                        (isAudioPlaying 
+                          ? "bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-amber-500/30 border-pink-400/60 text-white shadow-[0_0_25px_rgba(236,72,153,0.35)]" 
+                          : "bg-white/[0.05] border-white/15 text-slate-300 hover:border-purple-400/50")}>
+                        
+                        {/* Live Soundwave Bar */}
+                        <div className="flex items-center gap-1 cursor-pointer" onClick={toggleAudio} title="Toggle Play / Pause">
                           <span className={"eq-bar " + (!isAudioPlaying ? "!opacity-30 [animation-play-state:paused]" : "")}></span>
                           <span className={"eq-bar " + (!isAudioPlaying ? "!opacity-30 [animation-play-state:paused]" : "")}></span>
                           <span className={"eq-bar " + (!isAudioPlaying ? "!opacity-30 [animation-play-state:paused]" : "")}></span>
                           <span className={"eq-bar " + (!isAudioPlaying ? "!opacity-30 [animation-play-state:paused]" : "")}></span>
                           <span className={"eq-bar " + (!isAudioPlaying ? "!opacity-30 [animation-play-state:paused]" : "")}></span>
                         </div>
-                        <span className="uppercase tracking-widest text-[11px] text-amber-300 font-extrabold flex items-center gap-1.5">
-                          <span>{isAudioPlaying ? "🔊" : "🎵"}</span>
-                          <span>{isAudioPlaying ? "Party Anthem Playing" : "Tap to Play Anthem"}</span>
-                        </span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/15 text-pink-200 group-hover:bg-white/25 transition-all">
-                          {isAudioPlaying ? "Pause ⏸" : "Play ▶"}
-                        </span>
-                      </button>
 
-                      <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/10 text-[11px] text-slate-300 font-medium">
+                        {/* Prev Track */}
+                        <button 
+                          onClick={prevTrack} 
+                          type="button"
+                          title="Previous Track" 
+                          className="text-slate-300 hover:text-white p-1 hover:scale-110 active:scale-90 transition-all text-xs cursor-pointer">
+                          ⏮
+                        </button>
+
+                        {/* Play / Pause Toggle with Track Title */}
+                        <button 
+                          onClick={toggleAudio} 
+                          type="button"
+                          className="px-2.5 py-1 rounded-full bg-white/15 hover:bg-white/25 text-pink-200 transition-all font-mono text-[11px] flex items-center gap-1.5 cursor-pointer max-w-[170px] sm:max-w-none">
+                          <span>{isAudioPlaying ? "⏸" : "▶"}</span>
+                          <span className="uppercase tracking-wider text-[10px] text-amber-300 font-extrabold truncate">
+                            {DEFAULT_PLAYLIST[currentTrackIndex].title}
+                          </span>
+                        </button>
+
+                        {/* Next Track */}
+                        <button 
+                          onClick={nextTrack} 
+                          type="button"
+                          title="Next Track" 
+                          className="text-slate-300 hover:text-white p-1 hover:scale-110 active:scale-90 transition-all text-xs cursor-pointer">
+                          ⏭
+                        </button>
+
+                        {/* Playlist Quick Drawer Trigger */}
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); setPlaylistDrawerOpen(!playlistDrawerOpen); }}
+                          type="button"
+                          className="px-2 py-0.5 rounded-md bg-purple-500/25 border border-purple-400/40 text-purple-200 hover:bg-purple-500/40 text-[10px] font-mono flex items-center gap-1 cursor-pointer"
+                          title="View 3-Track Playlist">
+                          <span>🎶</span>
+                          <span>{currentTrackIndex + 1}/{DEFAULT_PLAYLIST.length}</span>
+                        </button>
+                      </div>
+
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/10 text-[11px] text-slate-300 font-medium">
                         <span className={"w-1.5 h-1.5 rounded-full " + (isAudioPlaying ? "bg-emerald-400 animate-pulse" : "bg-amber-400")}></span>
-                        <span>Overview Face Audio • Pauses on Itinerary</span>
+                        <span>Auto-playlist • Pauses on Itinerary</span>
                       </div>
                     </div>
 
@@ -2229,7 +2321,7 @@
                             <label className="text-amber-300 font-bold block mb-1">Target Date for Countdown:</label>
                             <input 
                               type="datetime-local" 
-                              value={data.targetDate || "2026-10-16T10:00"} 
+                              value={data.targetDate || "2026-10-16T16:00"} 
                               onChange={e => updateData(d => { d.targetDate = e.target.value; return d; }, "Updated target date")}
                               className="w-full glass-card px-3 py-2 rounded-xl text-xs text-white border border-purple-400 focus:outline-none"
                             />
@@ -3009,7 +3101,7 @@
             <footer className="border-t border-white/10 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-slate-400 mt-auto bg-black/30">
               <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-normal">
                 <div>
-                  © 2026 Freshers Welcome • October 16, 2026 • 10:00 AM
+                  © 2026 Freshers Welcome • October 16, 2026 • 4:00 PM – 7:00 PM
                 </div>
                 <div className="text-slate-400">
                   Management Lead: <strong className="text-white font-medium">Devansh Pandey</strong>
@@ -3053,41 +3145,112 @@
               )}
             </div>
 
-            {/* Floating Music Anthem Controller */}
+            {/* Floating Music Playlist Controller */}
             <div className={"fixed z-40 transition-all duration-300 " + (viewMode === "phone" ? "bottom-20 right-3" : "bottom-20 md:bottom-6 right-4 sm:right-6")}>
-              <div className="relative group">
-                <button
-                  onClick={toggleAudio}
-                  type="button"
-                  className={"flex items-center gap-2.5 px-3 py-2 sm:px-3.5 sm:py-2 rounded-2xl glass-card border backdrop-blur-xl shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer " + 
-                    (isAudioPlaying 
-                      ? "border-pink-500/50 bg-[#160c2b]/95 text-white shadow-[0_0_25px_rgba(236,72,153,0.35)]" 
-                      : "border-purple-500/30 bg-[#0e0720]/90 text-slate-300 hover:text-white hover:border-purple-400")}
-                  title={isAudioPlaying ? "Click to Pause Party Anthem" : (activeTab === "home" ? "Click to Play Party Anthem" : "Anthem plays on Overview face only")}>
-                  <div className={"w-7 h-7 rounded-xl flex items-center justify-center text-xs shadow-md transition-all " + (isAudioPlaying ? "bg-gradient-to-tr from-pink-500 to-purple-600 text-white animate-pulse" : "bg-white/10 text-slate-300")}>
-                    {isAudioPlaying ? "🔊" : "🎵"}
-                  </div>
-                  <div className="text-left pr-1">
-                    <div className="text-[11px] font-extrabold text-amber-300 flex items-center gap-1.5 leading-none">
-                      <span>Party Anthem</span>
-                      {isAudioPlaying && (
-                        <div className="flex items-center gap-0.5">
-                          <span className="w-1 h-2 rounded-full bg-pink-400 animate-pulse"></span>
-                          <span className="w-1 h-3 rounded-full bg-amber-400 animate-pulse" style={{ animationDelay: '0.2s' }}></span>
-                          <span className="w-1 h-1.5 rounded-full bg-cyan-400 animate-pulse" style={{ animationDelay: '0.4s' }}></span>
+              <div className="relative">
+                
+                {/* Playlist Drawer Dropdown Menu */}
+                {playlistDrawerOpen && (
+                  <div className="absolute bottom-full right-0 mb-3 w-72 sm:w-80 glass-card bg-[#100724]/95 border border-purple-500/40 rounded-2xl shadow-2xl p-3.5 space-y-2.5 backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                        <span>🎶</span>
+                        <span>Party Playlist ({DEFAULT_PLAYLIST.length} Tracks)</span>
+                      </div>
+                      <button 
+                        onClick={() => setPlaylistDrawerOpen(false)}
+                        className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer">
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5 max-h-56 overflow-y-auto">
+                      {DEFAULT_PLAYLIST.map((track, idx) => (
+                        <div
+                          key={track.id}
+                          onClick={() => {
+                            changeTrack(idx, true);
+                            setPlaylistDrawerOpen(false);
+                          }}
+                          className={"flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-all " + 
+                            (currentTrackIndex === idx 
+                              ? "bg-purple-600/35 border border-pink-400/50 text-white font-bold shadow-sm" 
+                              : "hover:bg-white/5 text-slate-300")}>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-5 text-center text-[10px] text-slate-400 font-mono">
+                              {currentTrackIndex === idx && isAudioPlaying ? "🔊" : `#${idx + 1}`}
+                            </span>
+                            <div className="truncate">
+                              <div className="truncate text-white">{track.title}</div>
+                              <div className="text-[10px] text-pink-300/80 font-normal">{track.tag}</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">{track.duration}</span>
                         </div>
-                      )}
+                      ))}
                     </div>
-                    <div className="text-[9px] text-slate-400 font-medium mt-1 leading-none">
-                      {isAudioPlaying 
-                        ? "Playing on Overview" 
-                        : (activeTab === "home" ? "Tap to Play" : "Paused • Overview only")}
+
+                    <div className="text-[10px] text-slate-400 border-t border-white/10 pt-2 flex items-center justify-between">
+                      <span>Overview Face Only</span>
+                      <span className="text-emerald-400">Continuous Auto-Advance</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-bold px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 transition-all ml-1">
-                    {isAudioPlaying ? "⏸" : "▶"}
-                  </span>
-                </button>
+                )}
+
+                {/* Main Floating Audio Dock Pill */}
+                <div className={"flex items-center gap-2 p-2 sm:px-3 sm:py-2 rounded-2xl glass-card border backdrop-blur-xl shadow-2xl transition-all " + 
+                  (isAudioPlaying 
+                    ? "border-pink-500/50 bg-[#160c2b]/95 text-white shadow-[0_0_25px_rgba(236,72,153,0.35)]" 
+                    : "border-purple-500/30 bg-[#0e0720]/90 text-slate-300")}>
+                  
+                  {/* Playlist Toggle Button */}
+                  <button
+                    onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
+                    type="button"
+                    className={"w-8 h-8 rounded-xl flex items-center justify-center text-xs shadow-md transition-all cursor-pointer " + (isAudioPlaying ? "bg-gradient-to-tr from-pink-500 to-purple-600 text-white animate-pulse" : "bg-white/10 text-slate-300 hover:text-white")}
+                    title="Open Playlist Menu">
+                    {isAudioPlaying ? "🔊" : "🎶"}
+                  </button>
+
+                  {/* Track Info */}
+                  <div 
+                    onClick={() => setPlaylistDrawerOpen(!playlistDrawerOpen)}
+                    className="text-left pr-1 cursor-pointer select-none">
+                    <div className="text-[11px] font-extrabold text-amber-300 flex items-center gap-1.5 leading-none max-w-[110px] sm:max-w-[140px] truncate">
+                      <span className="truncate">{DEFAULT_PLAYLIST[currentTrackIndex].title}</span>
+                    </div>
+                    <div className="text-[9px] text-slate-400 font-medium mt-1 leading-none flex items-center gap-1">
+                      <span>Track {currentTrackIndex + 1}/{DEFAULT_PLAYLIST.length}</span>
+                      <span>•</span>
+                      <span className="text-pink-300">{isAudioPlaying ? (activeTab === "home" ? "Playing" : "Paused") : "Paused"}</span>
+                    </div>
+                  </div>
+
+                  {/* Controls: Prev, Play/Pause, Next */}
+                  <div className="flex items-center gap-0.5 sm:gap-1 ml-1 border-l border-white/10 pl-1.5">
+                    <button
+                      onClick={prevTrack}
+                      type="button"
+                      className="p-1 text-slate-300 hover:text-white text-xs hover:scale-110 active:scale-90 transition-all cursor-pointer"
+                      title="Previous Track">
+                      ⏮
+                    </button>
+                    <button
+                      onClick={toggleAudio}
+                      type="button"
+                      className="px-2 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                      title={isAudioPlaying ? "Pause" : "Play"}>
+                      {isAudioPlaying ? "⏸" : "▶"}
+                    </button>
+                    <button
+                      onClick={nextTrack}
+                      type="button"
+                      className="p-1 text-slate-300 hover:text-white text-xs hover:scale-110 active:scale-90 transition-all cursor-pointer"
+                      title="Next Track">
+                      ⏭
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 

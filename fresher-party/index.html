@@ -725,8 +725,8 @@
       about: "Welcome to Freshers 2026-27! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
       contact: "Management Lead: DEVANSH PANDEY (+91 9794130719)",
       venue: "Main Auditorium, Campus Arena • Block B",
-      when: "Friday, October 16, 2026 • 10:00 AM Onwards",
-      targetDate: "2026-10-16T10:00",
+      when: "Friday, October 16, 2026 • 4:00 PM – 7:00 PM",
+      targetDate: "2026-10-16T16:00",
       anchors: [
         { k: "a", title: "A · Opening & Main Anchoring", names: "Devansh Pandey + Riya Jain" },
         { k: "b", title: "B · Main Stage Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
@@ -1214,7 +1214,7 @@
       // Countdown Timer
       useEffect(() => {
         const updateCountdown = () => {
-          const target = new Date(data.targetDate || "2026-10-16T10:00").getTime();
+          const target = new Date(data.targetDate || "2026-10-16T16:00").getTime();
           const now = Date.now();
           const diff = Math.max(0, target - now);
 
@@ -1708,7 +1708,7 @@
                       <span className="text-amber-300 font-extrabold text-xs px-1.5 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20">2026</span>
                     </div>
                     <div className="text-[10px] sm:text-[11px] font-semibold text-slate-400 tracking-wide truncate">
-                      Thursday, Oct 16 • 10:00 AM
+                      Friday, Oct 16 • 4:00 PM – 7:00 PM
                     </div>
                   </div>
                 </div>
@@ -2087,7 +2087,7 @@
                             <label className="text-amber-300 font-bold block mb-1">Target Date for Countdown:</label>
                             <input 
                               type="datetime-local" 
-                              value={data.targetDate || "2026-10-16T10:00"} 
+                              value={data.targetDate || "2026-10-16T16:00"} 
                               onChange={e => updateData(d => { d.targetDate = e.target.value; return d; }, "Updated target date")}
                               className="w-full glass-card px-3 py-2 rounded-xl text-xs text-white border border-purple-400 focus:outline-none"
                             />
@@ -2859,7 +2859,7 @@
             <footer className="border-t border-white/10 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-slate-400 mt-auto bg-black/30">
               <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-normal">
                 <div>
-                  © 2026 Freshers Welcome • October 16, 2026 • 10:00 AM
+                  © 2026 Freshers Welcome • October 16, 2026 • 4:00 PM – 7:00 PM
                 </div>
                 <div className="text-slate-400">
                   Management Lead: <strong className="text-white font-medium">Devansh Pandey</strong>
