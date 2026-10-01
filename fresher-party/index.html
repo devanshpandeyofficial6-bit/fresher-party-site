@@ -36,6 +36,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+  <!-- Three.js for 3D Motion and Interactive WebGL Background -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <style>
     :root {
       box-sizing: border-box;
@@ -45,31 +48,228 @@
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #0b0714;
+      background-color: #080512;
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(147, 51, 234, 0.22) 0%, transparent 45%),
-        radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.18) 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.16) 0%, transparent 50%);
+        radial-gradient(ellipse 65% 50% at 20% 10%, rgba(147, 51, 234, 0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 25%, rgba(236, 72, 153, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 50% 85%, rgba(79, 70, 229, 0.20) 0%, transparent 60%),
+        radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 40%);
       background-attachment: fixed;
       color: #f8fafc;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Keyframe Animations */
+    @keyframes partyFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes auraPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.04); }
+    }
+    @keyframes barDance {
+      0%, 100% { height: 4px; }
+      50% { height: 18px; }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* DJ Sound Wave & Audio Spectrum Visualizer Effect */
+    .dj-soundwave-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      max-width: 1050px;
+      max-height: 480px;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Radial DJ Sound Pressure Waves */
+    .dj-sonic-ring {
+      position: absolute;
+      border-radius: 9999px;
+      border: 2px solid rgba(236, 72, 153, 0.45);
+      box-shadow: 0 0 35px rgba(168, 85, 247, 0.35), inset 0 0 20px rgba(6, 182, 212, 0.25);
+      animation: djSonicPulse 3.8s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .dj-sonic-ring:nth-child(1) { animation-delay: 0s; }
+    .dj-sonic-ring:nth-child(2) { animation-delay: 0.95s; border-color: rgba(6, 182, 212, 0.5); }
+    .dj-sonic-ring:nth-child(3) { animation-delay: 1.9s; border-color: rgba(168, 85, 247, 0.45); }
+    .dj-sonic-ring:nth-child(4) { animation-delay: 2.85s; border-color: rgba(245, 158, 11, 0.4); }
+
+    @keyframes djSonicPulse {
+      0% {
+        width: 60px;
+        height: 60px;
+        opacity: 0.9;
+        transform: scale(0.5);
+      }
+      50% {
+        opacity: 0.55;
+      }
+      100% {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transform: scale(1.15);
+      }
+    }
+
+    /* DJ Stereo Equalizer Wave Spectrum */
+    .dj-spectrum-bar-wrap {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 92%;
+      max-width: 980px;
+      height: 150px;
+      opacity: 0.45;
+      filter: drop-shadow(0 0 14px rgba(236, 72, 153, 0.45));
+    }
+    @media (min-width: 640px) {
+      .dj-spectrum-bar-wrap { gap: 6px; }
+    }
+    .dj-spectrum-bar {
+      flex: 1;
+      max-width: 6px;
+      height: 20px;
+      border-radius: 9999px;
+      background: linear-gradient(to top, #ec4899 0%, #a855f7 50%, #06b6d4 100%);
+      animation: djWaveform 1.1s ease-in-out infinite alternate;
+      transform-origin: center;
+    }
+    .dj-spectrum-bar:nth-child(odd) {
+      background: linear-gradient(to top, #8b5cf6 0%, #ec4899 50%, #f59e0b 100%);
+    }
+
+    @keyframes djWaveform {
+      0% {
+        height: 10px;
+        opacity: 0.25;
+      }
+      50% {
+        height: 70px;
+        opacity: 0.85;
+      }
+      100% {
+        height: 130px;
+        opacity: 0.55;
+      }
+    }
+
+    /* Sound Equalizer Bars */
+    .eq-bar {
+      display: inline-block;
+      width: 3px;
+      border-radius: 9999px;
+      background: linear-gradient(to top, #ec4899, #a855f7, #fbbf24);
+      animation: barDance 1.1s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(1) { animation-delay: 0.1s; animation-duration: 0.8s; }
+    .eq-bar:nth-child(2) { animation-delay: 0.3s; animation-duration: 1.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.15s; animation-duration: 0.7s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.4s; animation-duration: 1.0s; }
+    .eq-bar:nth-child(5) { animation-delay: 0.2s; animation-duration: 0.9s; }
+
+    /* Festival Gradient Titles */
+    .fest-title-gradient {
+      background: linear-gradient(135deg, #ffffff 10%, #fef08a 35%, #f472b6 65%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 25px rgba(236, 72, 153, 0.35));
+    }
+    .gold-title-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #fde047 40%, #f59e0b 80%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 18px rgba(245, 158, 11, 0.4));
     }
 
     /* Glass Panels */
     .glass-nav {
-      background: rgba(15, 10, 26, 0.92);
+      background: rgba(10, 6, 20, 0.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(168, 85, 247, 0.25);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.22);
     }
     .glass-card {
-      background: rgba(22, 15, 38, 0.88);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(168, 85, 247, 0.25);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      background: rgba(18, 11, 34, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.22);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
     }
     .glass-card:hover {
+      border-color: rgba(236, 72, 153, 0.4);
+      box-shadow: 0 12px 35px -8px rgba(168, 85, 247, 0.25);
+    }
+
+    /* Festive Event Attraction Card */
+    .fest-feature-card {
+      background: linear-gradient(145deg, rgba(28, 16, 50, 0.8) 0%, rgba(14, 8, 28, 0.9) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 1.25rem;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .fest-feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(236, 72, 153, 0.5);
+      box-shadow: 0 16px 36px -10px rgba(236, 72, 153, 0.3);
+    }
+
+    /* Accent-border cards */
+    .accent-card {
+      background: rgba(18, 11, 34, 0.85);
+      border-left: 3px solid;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      border-right: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 8px 26px -6px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Schedule row — tighter, content-first */
+    .sched-row {
+      background: rgba(16, 10, 30, 0.85);
+      border: 1px solid rgba(147, 51, 234, 0.20);
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+    .sched-row:hover {
+      background: rgba(26, 15, 48, 0.95);
       border-color: rgba(192, 132, 252, 0.45);
+      transform: translateX(2px);
+    }
+    .sched-row-dj {
+      background: linear-gradient(135deg, rgba(147, 24, 110, 0.5) 0%, rgba(68, 12, 100, 0.7) 100%);
+      border: 1px solid rgba(244, 114, 182, 0.55);
+      box-shadow: 0 0 30px -5px rgba(236, 72, 153, 0.4);
+    }
+    .sched-row-slot {
+      background: rgba(12, 38, 28, 0.65);
+      border: 1px dashed rgba(52, 211, 153, 0.4);
+    }
+
+    /* Subtle divider line */
+    .rule-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(168, 85, 247, 0.4) 30%, rgba(236, 72, 153, 0.35) 70%, transparent 100%);
+      border: none;
     }
 
     /* Live In-place Text Editing */
@@ -189,20 +389,270 @@
   <script type="text/babel">
     const { useState, useEffect, useRef, useLayoutEffect, useCallback } = React;
 
+    // ============================================================
+    // 3D MOTION SYSTEM: Interactive Three.js WebGL Particle & Geometry Scene
+    // ============================================================
+    function ThreeDBackground() {
+      const mountRef = useRef(null);
+
+      useEffect(() => {
+        if (typeof THREE === "undefined" || !mountRef.current) return;
+
+        const container = mountRef.current;
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+        camera.position.z = 28;
+
+        let renderer;
+        try {
+          renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        } catch (e) {
+          console.warn("WebGL not supported for 3D background", e);
+          return;
+        }
+
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Group for floating 3D party geometries
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const geometries = [
+          new THREE.IcosahedronGeometry(1.6, 0),
+          new THREE.OctahedronGeometry(1.3, 0),
+          new THREE.TetrahedronGeometry(1.4, 0),
+          new THREE.TorusGeometry(2.2, 0.35, 16, 60),
+          new THREE.DodecahedronGeometry(1.5, 0)
+        ];
+
+        const colors = [0xec4899, 0xa855f7, 0xf59e0b, 0x06b6d4, 0x8b5cf6, 0xf43f5e];
+
+        const meshes = [];
+        // Create 15 floating 3D festive geometries
+        for (let i = 0; i < 15; i++) {
+          const geom = geometries[i % geometries.length];
+          const color = colors[i % colors.length];
+
+          const mat = new THREE.MeshBasicMaterial({
+            color: color,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.32
+          });
+
+          const mesh = new THREE.Mesh(geom, mat);
+          mesh.position.x = (Math.random() - 0.5) * 50;
+          mesh.position.y = (Math.random() - 0.5) * 40;
+          mesh.position.z = (Math.random() - 0.5) * 30;
+
+          mesh.rotSpeedX = (Math.random() - 0.5) * 0.014;
+          mesh.rotSpeedY = (Math.random() - 0.5) * 0.018;
+          mesh.initY = mesh.position.y;
+          mesh.floatOffset = Math.random() * Math.PI * 2;
+
+          group.add(mesh);
+          meshes.push(mesh);
+        }
+
+        // 3D Particle Starfield / Floating Glitter
+        const particleCount = 220;
+        const starGeom = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i += 3) {
+          starPositions[i] = (Math.random() - 0.5) * 65;
+          starPositions[i + 1] = (Math.random() - 0.5) * 55;
+          starPositions[i + 2] = (Math.random() - 0.5) * 45;
+        }
+
+        starGeom.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+        const starMat = new THREE.PointsMaterial({
+          color: 0xf472b6,
+          size: 0.4,
+          transparent: true,
+          opacity: 0.7
+        });
+
+        const starField = new THREE.Points(starGeom, starMat);
+        scene.add(starField);
+
+        // Smooth Mouse Parallax
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        const onMouseMove = (e) => {
+          mouseX = (e.clientX - width / 2) * 0.0006;
+          mouseY = (e.clientY - height / 2) * 0.0006;
+        };
+
+        window.addEventListener("mousemove", onMouseMove, { passive: true });
+
+        const onResize = () => {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+          renderer.setSize(width, height);
+        };
+        window.addEventListener("resize", onResize);
+
+        let reqId;
+        let clock = new THREE.Clock();
+
+        const animate = () => {
+          reqId = requestAnimationFrame(animate);
+          const t = clock.getElapsedTime();
+
+          targetX += (mouseX - targetX) * 0.05;
+          targetY += (mouseY - targetY) * 0.05;
+
+          camera.position.x = targetX * 10;
+          camera.position.y = -targetY * 8;
+          camera.lookAt(scene.position);
+
+          meshes.forEach((m, idx) => {
+            m.rotation.x += m.rotSpeedX;
+            m.rotation.y += m.rotSpeedY;
+            m.position.y = m.initY + Math.sin(t * 1.4 + m.floatOffset) * 1.2;
+          });
+
+          starField.rotation.y = t * 0.015;
+          group.rotation.y = t * 0.025;
+
+          renderer.render(scene, camera);
+        };
+
+        animate();
+
+        return () => {
+          cancelAnimationFrame(reqId);
+          window.removeEventListener("mousemove", onMouseMove);
+          window.removeEventListener("resize", onResize);
+          if (renderer && renderer.domElement && container.contains(renderer.domElement)) {
+            container.removeChild(renderer.domElement);
+          }
+          renderer.dispose();
+        };
+      }, []);
+
+      return (
+        <div
+          ref={mountRef}
+          className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+          aria-hidden="true"
+        ></div>
+      );
+    }
+
+    // ============================================================
+    // 3D MOTION SYSTEM: Interactive Perspective Tilt Card Component
+    // ============================================================
+    function TiltCard({ children, className = "", maxTilt = 8, scale = 1.02, ...props }) {
+      const [tilt, setTilt] = useState({ rx: 0, ry: 0, s: 1 });
+      const cardRef = useRef(null);
+
+      const handleMouseMove = (e) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        setTilt({ rx: -y * maxTilt, ry: x * maxTilt, s: scale });
+      };
+
+      const handleMouseLeave = () => {
+        setTilt({ rx: 0, ry: 0, s: 1 });
+      };
+
+      return (
+        <div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            transform: `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale3d(${tilt.s}, ${tilt.s}, ${tilt.s})`,
+            transition: tilt.s === 1 ? "transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)" : "transform 0.08s ease-out",
+            transformStyle: "preserve-3d"
+          }}
+          className={className}
+          {...props}
+        >
+          {children}
+        </div>
+      );
+    }
+
+    // ============================================================
+    // DJ SOUNDWAVE & EQUALIZER VISUALIZER SYSTEM
+    // ============================================================
+    function DJSoundwaveVisualizer() {
+      // 36 audio equalizer frequency bars mirrored stereo spectrum
+      const bars = [
+        { h: 26, d: 0.1, s: 0.8 }, { h: 42, d: 0.35, s: 1.1 }, { h: 64, d: 0.15, s: 0.9 },
+        { h: 48, d: 0.5, s: 1.25 }, { h: 76, d: 0.2, s: 0.75 }, { h: 95, d: 0.35, s: 1.05 },
+        { h: 80, d: 0.55, s: 1.2 }, { h: 110, d: 0.1, s: 0.85 }, { h: 96, d: 0.25, s: 1.15 },
+        { h: 130, d: 0.4, s: 0.95 }, { h: 92, d: 0.15, s: 1.3 }, { h: 122, d: 0.3, s: 0.8 },
+        { h: 104, d: 0.45, s: 1.05 }, { h: 138, d: 0.2, s: 1.25 }, { h: 120, d: 0.1, s: 0.9 },
+        { h: 145, d: 0.35, s: 1.1 }, { h: 150, d: 0.05, s: 0.75 }, { h: 145, d: 0.25, s: 1.15 },
+        { h: 150, d: 0.05, s: 0.75 }, { h: 145, d: 0.35, s: 1.1 }, { h: 120, d: 0.1, s: 0.9 },
+        { h: 138, d: 0.2, s: 1.25 }, { h: 104, d: 0.45, s: 1.05 }, { h: 122, d: 0.3, s: 0.8 },
+        { h: 92, d: 0.15, s: 1.3 }, { h: 130, d: 0.4, s: 0.95 }, { h: 96, d: 0.25, s: 1.15 },
+        { h: 110, d: 0.1, s: 0.85 }, { h: 80, d: 0.55, s: 1.2 }, { h: 95, d: 0.35, s: 1.05 },
+        { h: 76, d: 0.2, s: 0.75 }, { h: 48, d: 0.5, s: 1.25 }, { h: 64, d: 0.15, s: 0.9 },
+        { h: 42, d: 0.35, s: 1.1 }, { h: 26, d: 0.1, s: 0.8 }
+      ];
+
+      return (
+        <div className="dj-soundwave-container" aria-hidden="true">
+          {/* Radial DJ Sonic Bass Pressure Rings */}
+          <div className="dj-sonic-ring"></div>
+          <div className="dj-sonic-ring"></div>
+          <div className="dj-sonic-ring"></div>
+          <div className="dj-sonic-ring"></div>
+
+          {/* Central DJ Equalizer Spectrum Soundwave */}
+          <div className="dj-spectrum-bar-wrap">
+            {bars.map((bar, idx) => (
+              <div
+                key={idx}
+                className="dj-spectrum-bar"
+                style={{
+                  maxHeight: `${bar.h}px`,
+                  animationDelay: `${bar.d}s`,
+                  animationDuration: `${bar.s}s`
+                }}
+              ></div>
+            ))}
+          </div>
+
+          {/* Ambient Bass Glow Core */}
+          <div className="absolute w-80 h-40 bg-gradient-to-r from-pink-500/20 via-purple-500/25 to-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        </div>
+      );
+    }
+
     const ADMIN_EMAIL = "devanshpandeyofficial6@gmail.com";
     const ADMIN_PASS = "iamdumb@123";
 
+    const DEFAULT_FIREBASE_URL = "https://freshers-c9de2-default-rtdb.firebaseio.com";
+
     // Supported Performance / Row Categories
     const ROW_CATEGORIES = [
-      { id: "perf", label: "Performance", badge: "bg-purple-500/25 text-purple-200 border-purple-400/40" },
-      { id: "dance", label: "Dance Performance", badge: "bg-pink-500/25 text-pink-200 border-pink-400/40" },
-      { id: "sing", label: "Singing", badge: "bg-cyan-500/25 text-cyan-200 border-cyan-400/40" },
-      { id: "skit", label: "Skit / Drama", badge: "bg-blue-500/25 text-blue-200 border-blue-400/40" },
-      { id: "ramp", label: "Ramp Walk Round", badge: "bg-amber-500/25 text-amber-200 border-amber-400/40" },
-      { id: "anc", label: "Anchor Link", badge: "bg-rose-500/25 text-rose-200 border-rose-400/40" },
-      { id: "slot", label: "Open Slot", badge: "bg-emerald-500/25 text-emerald-200 border-emerald-400/40" },
-      { id: "fin", label: "Finale / Award", badge: "bg-yellow-500/25 text-yellow-200 border-yellow-400/40" },
-      { id: "dj", label: "DJ & Dining", badge: "bg-gradient-to-r from-pink-600/30 to-purple-600/30 text-white border-pink-400/50" }
+      { id: "perf", label: "Performance", badge: "bg-purple-500/15 text-purple-200 border-purple-500/30" },
+      { id: "dance", label: "Dance Performance", badge: "bg-pink-500/15 text-pink-200 border-pink-500/30" },
+      { id: "sing", label: "Singing", badge: "bg-sky-500/15 text-sky-200 border-sky-500/30" },
+      { id: "skit", label: "Skit / Drama", badge: "bg-indigo-500/15 text-indigo-200 border-indigo-500/30" },
+      { id: "ramp", label: "Ramp Walk Round", badge: "bg-amber-500/15 text-amber-200 border-amber-500/30" },
+      { id: "anc", label: "Anchor Link", badge: "bg-rose-500/15 text-rose-200 border-rose-500/30" },
+      { id: "slot", label: "Open Slot", badge: "bg-emerald-500/15 text-emerald-200 border-emerald-500/30" },
+      { id: "fin", label: "Finale / Award", badge: "bg-yellow-500/15 text-yellow-200 border-yellow-500/40 font-semibold" },
+      { id: "dj", label: "DJ & Dining", badge: "bg-gradient-to-r from-pink-500/20 to-purple-500/25 text-pink-200 border-pink-400/40 font-bold" }
     ];
 
     const TYPES_MAP = ROW_CATEGORIES.reduce((acc, curr) => {
@@ -214,11 +664,13 @@
     const DEFAULT_DEPARTMENTS = [
       "Technical Department",
       "Video & Photography Department",
+      "Music Department",
       "Sound Department",
-      "Management & Hospitality Department",
+      "Disciplinary & Hospitality Department",
       "Anchors",
       "Rampwalk",
       "Fillers",
+      "Choreography",
       "Art & Craft"
     ];
 
@@ -229,31 +681,34 @@
       { id: "m3", department: "Video & Photography Department", role: "Member", name: "Ayush Pal", rollNo: "2500460120007" },
       { id: "m4", department: "Video & Photography Department", role: "Member", name: "Parth Gupta", rollNo: "NOT FOUND" },
       { id: "m5", department: "Video & Photography Department", role: "Member", name: "Anand Kumar", rollNo: "2500461520024" },
-      { id: "m6", department: "Sound Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "NOT FOUND" },
-      { id: "m7", department: "Management & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
-      { id: "m8", department: "Management & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
-      { id: "m9", department: "Management & Hospitality Department", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
-      { id: "m10", department: "Management & Hospitality Department", role: "Member", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
-      { id: "m11", department: "Management & Hospitality Department", role: "Member", name: "Shivanand Pal", rollNo: "2500461520165" },
-      { id: "m12", department: "Management & Hospitality Department", role: "Member", name: "Yash Gupta", rollNo: "2500460100188" },
-      { id: "m13", department: "Management & Hospitality Department", role: "Member", name: "Rohit Kumar", rollNo: "2500460100151" },
-      { id: "m14", department: "Management & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
-      { id: "m15", department: "Management & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
-      { id: "m16", department: "Management & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
-      { id: "m17", department: "Anchors", role: "Anchor", name: "Devansh Pandey", rollNo: "2500461520057" },
-      { id: "m18", department: "Anchors", role: "Anchor", name: "Riya Jain", rollNo: "2500460100148" },
-      { id: "m19", department: "Anchors", role: "Anchor", name: "Rudraksha Sharma", rollNo: "2500460100154" },
-      { id: "m20", department: "Anchors", role: "Anchor", name: "Yashi Srivastava", rollNo: "2500460100208" },
-      { id: "m21", department: "Rampwalk", role: "Lead / Anchor", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
-      { id: "m22", department: "Rampwalk", role: "Lead / Anchor", name: "Aakriti Srivastava", rollNo: "2500461520001" },
-      { id: "m23", department: "Rampwalk", role: "Lead / Anchor", name: "Shivanand Pal", rollNo: "2500461520147" },
-      { id: "m24", department: "Rampwalk", role: "Anchor", name: "Anvesha Chaudhary", rollNo: "2500461520036" },
-      { id: "m25", department: "Fillers", role: "Filler", name: "Rohit Kumar", rollNo: "2500460100151" },
-      { id: "m26", department: "Fillers", role: "Filler", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m6", department: "Music Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "---1st Year---" },
+      { id: "m0", department: "Disciplinary & Hospitality Department", role: "Management Lead", name: "Devansh Pandey", rollNo: "2500461520057" },
+      { id: "m7", department: "Disciplinary & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
+      { id: "m8", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
+      { id: "m9", department: "Disciplinary & Hospitality Department", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
+      { id: "m10", department: "Disciplinary & Hospitality Department", role: "Member", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
+      { id: "m11", department: "Disciplinary & Hospitality Department", role: "Member", name: "Shivanand Pal", rollNo: "2500461520165" },
+      { id: "m12", department: "Disciplinary & Hospitality Department", role: "Member", name: "Yash Gupta", rollNo: "2500460100188" },
+      { id: "m13", department: "Disciplinary & Hospitality Department", role: "Member", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m14", department: "Disciplinary & Hospitality Department", role: "Member", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m15", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
+      { id: "m16", department: "Disciplinary & Hospitality Department", role: "Member", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
+      { id: "m17", department: "Anchors", role: "Anchor (Squad A)", name: "Devansh Pandey", rollNo: "2500461520057" },
+      { id: "m18", department: "Anchors", role: "Anchor (Squad A)", name: "Riya Jain", rollNo: "2500460100148" },
+      { id: "m19", department: "Anchors", role: "Anchor (Squad B)", name: "Rudraksha Sharma", rollNo: "2500460100154" },
+      { id: "m20", department: "Anchors", role: "Anchor (Squad B)", name: "Yashi Srivastava", rollNo: "2500460100208" },
+      { id: "m25a", department: "Anchors", role: "Anchor / Filler (Squad C)", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m26a", department: "Anchors", role: "Anchor / Filler (Squad C)", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
+      { id: "m21", department: "Rampwalk", role: "Ramp Lead / Anchor (Squad D)", name: "Vaibhav Jauhari", rollNo: "2500461520165" },
+      { id: "m22", department: "Rampwalk", role: "Ramp Lead / Anchor (Squad D)", name: "Aakriti Srivastava", rollNo: "2500461520001" },
+      { id: "m23", department: "Rampwalk", role: "Member", name: "Shivanand Pal", rollNo: "2500461520147" },
+      { id: "m24", department: "Rampwalk", role: "Member", name: "Anvesha Chaudhary", rollNo: "2500461520036" },
+      { id: "m25", department: "Fillers", role: "Filler Lead", name: "Rohit Kumar", rollNo: "2500460100151" },
+      { id: "m26", department: "Fillers", role: "Filler Lead", name: "Mayank Vishwakarma", rollNo: "2500460100105" },
       { id: "m27", department: "Fillers", role: "Filler", name: "Shreyansh Tripathi", rollNo: "2503491530104" },
       { id: "m28", department: "Fillers", role: "Filler", name: "Lakshya Agnihotri", rollNo: "2500460100100" },
-      { id: "m29", department: "Art & Craft", role: "Lead / Member", name: "Riya Jain", rollNo: "2500460100148" },
-      { id: "m30", department: "Art & Craft", role: "Lead / Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
+      { id: "m29", department: "Choreography", role: "Choreography Lead", name: "Riya Jain", rollNo: "2500460100148" },
+      { id: "m30", department: "Art & Craft", role: "Art & Craft Lead", name: "Bhoomi Gupta", rollNo: "2500460100066" },
       { id: "m31", department: "Art & Craft", role: "Member", name: "Lavanya Verma", rollNo: "250046010101" },
       { id: "m32", department: "Art & Craft", role: "Member", name: "Ashirbad", rollNo: "2500461520043" },
       { id: "m33", department: "Art & Craft", role: "Member", name: "Ayush Shukla", rollNo: "2503491530043" },
@@ -265,19 +720,18 @@
 
     // Complete 41-Item Official Itinerary
     const DEFAULT_DATA = {
-      title: "Freshers 2026",
+      title: "Freshers 2026-27",
       sub: "Official Run of Show, Organizing Committee & Performance Schedule",
-      about: "Welcome to Freshers 2026! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
+      about: "Welcome to Freshers 2026-27! Join us for a grand celebration featuring Ganesh Vandhana, sensational solo & duet dances, energetic college skits, 4 high-fashion ramp walk rounds, the Mr & Miss Fresher crowning, behind the scenes video, batch distribution, followed by DJ and dining.",
       contact: "Management Lead: DEVANSH PANDEY (+91 9794130719)",
       venue: "Main Auditorium, Campus Arena • Block B",
       when: "Friday, October 16, 2026 • 10:00 AM Onwards",
       targetDate: "2026-10-16T10:00",
       anchors: [
-        { k: "a", title: "A · Anchoring", names: "Devansh Pandey + Riya Jain" },
-        { k: "b", title: "B · Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
-        { k: "c", title: "C · Anchoring (Fillers)", names: "Shivanand Pal + Anvesha Chaudary" },
-        { k: "d", title: "D · Ramp Walk Anchoring", names: "Vaibhav Jauhari + Aakriti Srivastava" },
-        { k: "e", title: "E · Fillers", names: "Rohit Kumar & Mayank Vishwakarma" }
+        { k: "a", title: "A · Opening & Main Anchoring", names: "Devansh Pandey + Riya Jain" },
+        { k: "b", title: "B · Main Stage Anchoring", names: "Rudraksha Sharma + Yashi Srivastava" },
+        { k: "c", title: "C · Fillers & Stage Anchoring", names: "Rohit Kumar & Mayank Vishwakarma" },
+        { k: "d", title: "D · Ramp Walk Anchoring", names: "Vaibhav Jauhari + Aakriti Srivastava" }
       ],
       rows: [
         { type: "anc", title: "Anchor A Opening", who: "Devansh Pandey + Riya Jain", min: "2 MIN" },
@@ -290,18 +744,18 @@
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
         { type: "anc", title: "Anchor A Link", who: "Anchors A", min: "2 MIN" },
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
-        { type: "anc", title: "Anchors A + E + D Interaction", who: "Anchors A + E + D", min: "5+2 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 1", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "anc", title: "Anchors A + C + D Interaction", who: "Anchors A + C + D", min: "5+2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 1", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchor D Link", who: "Anchor D", min: "1 MIN" },
         { type: "sing", title: "SOLO SINGING", who: "Tanishq", min: "4 MIN" },
         { type: "anc", title: "Anchor D Link", who: "Anchor D", min: "1 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 2", who: "Freshers Batch • Anchors D + C", min: "" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 2", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
         { type: "dance", title: "DUET DANCE", who: "Rudraksha + Devansh", min: "" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
         { type: "skit", title: "SKIT (2ND & 1ST YEAR)", who: "2nd & 1st Year Crew", min: "10 MIN" },
-        { type: "anc", title: "Anchor E Link", who: "Anchor E", min: "2 MIN" },
-        { type: "ramp", title: "RAMP ROUND - 3", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "anc", title: "Anchor C Link", who: "Anchor C (Rohit & Mayank)", min: "2 MIN" },
+        { type: "ramp", title: "RAMP ROUND - 3", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
         { type: "dance", title: "GROUP DANCE", who: "2nd Year: Riya Jain & Rudraksha Sharma", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
@@ -312,13 +766,13 @@
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
         { type: "anc", title: "Anchor B Link", who: "Anchor B", min: "2 MIN" },
         { type: "slot", title: "Slot Open", who: "Open for Freshers", min: "" },
-        { type: "ramp", title: "RAMP ROUND - 4", who: "Freshers Batch • Anchors D + C", min: "" },
+        { type: "ramp", title: "RAMP ROUND - 4", who: "Freshers Batch • Anchor D (Vaibhav & Aakriti)", min: "" },
         { type: "anc", title: "Anchors A + B", who: "Anchors A & B", min: "" },
         { type: "fin", title: "Miss & Mr Fresher Announcement", who: "Anchors A + B + Dignitaries", min: "" },
         { type: "anc", title: "Anchors A + B Link", who: "Anchors A & B", min: "" },
         { type: "fin", title: "Behind The Scenes (BTS) Video", who: "Media & Tech Team", min: "" },
         { type: "fin", title: "Thank You to All Members", who: "Organizing Committee", min: "" },
-        { type: "anc", title: "All Anchors (A + B + C + D + E)", who: "All Anchor Squads", min: "" },
+        { type: "anc", title: "All Anchors (A + B + C + D)", who: "All Anchor Squads (A, B, C, D)", min: "" },
         { type: "fin", title: "Batch Distribution", who: "All Anchors & Seniors", min: "" },
         { type: "dj", title: "🔥 DJ & Dining Buffet", who: "Open for Everyone", min: "Unlimited" }
       ]
@@ -382,8 +836,20 @@
       // Data State
       const [data, setData] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_party_data_v9");
-          return saved ? JSON.parse(saved) : DEFAULT_DATA;
+          const saved = localStorage.getItem("fresher_party_data_v9") ||
+                        localStorage.getItem("fresher_party_data_v8") ||
+                        localStorage.getItem("fresher_party_data");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.title === "Freshers 2026" || !parsed.title) {
+              parsed.title = "Freshers 2026-27";
+            }
+            if (parsed.anchors && parsed.anchors.length > 4) {
+              parsed.anchors = DEFAULT_DATA.anchors;
+            }
+            return parsed;
+          }
+          return DEFAULT_DATA;
         } catch (e) {
           return DEFAULT_DATA;
         }
@@ -392,8 +858,15 @@
       // Committee Members State
       const [members, setMembers] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_committee_members_v3");
-          return saved ? JSON.parse(saved) : DEFAULT_MEMBERS;
+          const saved = localStorage.getItem("fresher_committee_members_v4") ||
+                        localStorage.getItem("fresher_committee_members_v3") ||
+                        localStorage.getItem("fresher_committee_members_v2") ||
+                        localStorage.getItem("fresher_committee_members");
+          if (saved) {
+            const list = JSON.parse(saved);
+            return list;
+          }
+          return DEFAULT_MEMBERS;
         } catch (e) {
           return DEFAULT_MEMBERS;
         }
@@ -446,12 +919,14 @@
       const [isSyncing, setIsSyncing] = useState(false);
       const [cloudConfigModal, setCloudConfigModal] = useState(false);
       const [firebaseUrl, setFirebaseUrl] = useState(() => {
-        return localStorage.getItem("fresher_firebase_url") || "";
+        return localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
       });
 
       // UI States
       const [editMode, setEditMode] = useState(false);
       const [activeTab, setActiveTab] = useState("home"); // 'home' | 'schedule' | 'members' | 'team' | 'admin'
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+      const [viewMode, setViewMode] = useState("auto"); // 'auto' | 'phone' | 'desktop'
       const [authModalOpen, setAuthModalOpen] = useState(false);
       const [isSignup, setIsSignup] = useState(false);
       const [authEmail, setAuthEmail] = useState("");
@@ -503,44 +978,36 @@
         if (isSyncing && !forced) return;
         setIsSyncing(true);
 
-        // Tier 1: Try Local / Hosted Node Server REST API
-        try {
-          const res = await fetch("/api/sync", { cache: "no-store" });
-          if (res.ok) {
-            const remote = await res.json();
-            if (remote.users && Array.isArray(remote.users)) {
-              setUsers(prev => {
-                const map = new Map();
-                prev.forEach(u => map.set(u.email.toLowerCase(), u));
-                remote.users.forEach(u => {
-                  const existing = map.get(u.email.toLowerCase()) || {};
-                  map.set(u.email.toLowerCase(), { ...existing, ...u });
-                });
-                const merged = Array.from(map.values());
-                localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
-                return merged;
-              });
+        // Helper to update current active user session if permissions changed remotely
+        const refreshCurrentSessionFromUsers = (userList) => {
+          try {
+            const activeSession = JSON.parse(localStorage.getItem("fresher_active_session") || "null");
+            if (activeSession && activeSession.email) {
+              const matched = userList.find(u => u.email.toLowerCase() === activeSession.email.toLowerCase());
+              if (matched && (matched.canEdit !== activeSession.canEdit || matched.role !== activeSession.role)) {
+                const refreshed = { ...activeSession, canEdit: matched.canEdit, role: matched.role };
+                localStorage.setItem("fresher_active_session", JSON.stringify(refreshed));
+                setCurrentUser(refreshed);
+              }
             }
-            if (remote.itinerary) {
-              setData(remote.itinerary);
-              localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
-            }
-            if (remote.members) {
-              setMembers(remote.members);
-              localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
-            }
-            setCloudStatus("server");
-            setLastSyncTime(new Date());
-            setIsSyncing(false);
-            return;
-          }
-        } catch (e) {
-          // Server endpoint not available; fall through to Firebase
-        }
+          } catch (e) {}
+        };
 
-        // Tier 2: Try Firebase Realtime Database
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
-        if (customUrl && typeof firebase !== "undefined") {
+        const sanitizeItinerary = (itin) => {
+          if (!itin) return DEFAULT_DATA;
+          const copy = JSON.parse(JSON.stringify(itin));
+          if (!copy.title || copy.title === "Freshers 2026") copy.title = "Freshers 2026-27";
+          return copy;
+        };
+
+        const sanitizeMembers = (memList) => {
+          if (!memList || !Array.isArray(memList)) return DEFAULT_MEMBERS;
+          return memList;
+        };
+
+        // Tier 1: Firebase Realtime Database (Real-time global sync across all devices)
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
+        if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
             const res = await fetch(`${cleanUrl}/portal_state.json`);
@@ -558,16 +1025,19 @@
                     });
                     const merged = Array.from(map.values());
                     localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                    refreshCurrentSessionFromUsers(merged);
                     return merged;
                   });
                 }
                 if (remote.itinerary) {
-                  setData(remote.itinerary);
-                  localStorage.setItem("fresher_party_data_v9", JSON.stringify(remote.itinerary));
+                  const cleanItin = sanitizeItinerary(remote.itinerary);
+                  setData(cleanItin);
+                  localStorage.setItem("fresher_party_data_v9", JSON.stringify(cleanItin));
                 }
                 if (remote.members) {
-                  setMembers(remote.members);
-                  localStorage.setItem("fresher_committee_members_v3", JSON.stringify(remote.members));
+                  const cleanMem = sanitizeMembers(remote.members);
+                  setMembers(cleanMem);
+                  localStorage.setItem("fresher_committee_members_v4", JSON.stringify(cleanMem));
                 }
               }
               setCloudStatus("connected");
@@ -580,6 +1050,44 @@
           }
         }
 
+        // Tier 2: Try Local / Hosted Node Server REST API
+        try {
+          const res = await fetch("/api/sync", { cache: "no-store" });
+          if (res.ok) {
+            const remote = await res.json();
+            if (remote.users && Array.isArray(remote.users)) {
+              setUsers(prev => {
+                const map = new Map();
+                prev.forEach(u => map.set(u.email.toLowerCase(), u));
+                remote.users.forEach(u => {
+                  const existing = map.get(u.email.toLowerCase()) || {};
+                  map.set(u.email.toLowerCase(), { ...existing, ...u });
+                });
+                const merged = Array.from(map.values());
+                localStorage.setItem("fresher_party_users_v2", JSON.stringify(merged));
+                refreshCurrentSessionFromUsers(merged);
+                return merged;
+              });
+            }
+            if (remote.itinerary) {
+              const cleanItin = sanitizeItinerary(remote.itinerary);
+              setData(cleanItin);
+              localStorage.setItem("fresher_party_data_v9", JSON.stringify(cleanItin));
+            }
+            if (remote.members) {
+              const cleanMem = sanitizeMembers(remote.members);
+              setMembers(cleanMem);
+              localStorage.setItem("fresher_committee_members_v4", JSON.stringify(cleanMem));
+            }
+            setCloudStatus("server");
+            setLastSyncTime(new Date());
+            setIsSyncing(false);
+            return;
+          }
+        } catch (e) {
+          // Fall through to local storage
+        }
+
         // Tier 3: Local Storage mode
         setCloudStatus("local");
         setLastSyncTime(new Date());
@@ -588,18 +1096,7 @@
 
       // Push a registered/updated user to cloud backend
       const pushUserToCloud = async (userObj) => {
-        // Try server
-        try {
-          const res = await fetch("/api/auth/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userObj)
-          });
-          if (res.ok) return true;
-        } catch (e) {}
-
-        // Try Firebase
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
         if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
@@ -609,34 +1106,23 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(userObj)
             });
-            return true;
           } catch (e) {}
         }
-        return false;
+
+        // Try server as well
+        try {
+          await fetch("/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userObj)
+          });
+        } catch (e) {}
+        return true;
       };
 
       // Push all data state changes to cloud
       const pushStateToCloud = async (updatedData, updatedMembers, updatedUsers) => {
-        // Try Server
-        try {
-          if (updatedData) {
-            await fetch("/api/itinerary", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ itinerary: updatedData })
-            });
-          }
-          if (updatedMembers) {
-            await fetch("/api/members", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ members: updatedMembers })
-            });
-          }
-        } catch (e) {}
-
-        // Try Firebase
-        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url");
+        const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
         if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
@@ -656,6 +1142,24 @@
             }
           } catch (e) {}
         }
+
+        // Try Server as well
+        try {
+          if (updatedData) {
+            await fetch("/api/itinerary", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ itinerary: updatedData })
+            });
+          }
+          if (updatedMembers) {
+            await fetch("/api/members", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ members: updatedMembers })
+            });
+          }
+        } catch (e) {}
       };
 
       // Periodic Auto-Sync Every 6 seconds for multi-device live refresh
@@ -701,7 +1205,7 @@
       const updateMembers = (updater, logMsg) => {
         setMembers(prev => {
           const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
-          localStorage.setItem("fresher_committee_members_v3", JSON.stringify(next));
+          localStorage.setItem("fresher_committee_members_v4", JSON.stringify(next));
           pushStateToCloud(null, next, null);
           return next;
         });
@@ -1018,6 +1522,39 @@
         return cat ? cat.badge : "bg-slate-700/50 text-slate-200 border-slate-600";
       };
 
+      const getLeadBadgeStyle = (role, dept) => {
+        const r = (role || "").toLowerCase();
+        const d = (dept || "").toLowerCase();
+        const isLead = r.includes("lead") || r.includes("head") || r.includes("anchor") || r.includes("composer");
+        if (!isLead) return "bg-purple-500/20 text-purple-200 border-purple-400/30";
+
+        if (r.includes("management") || d.includes("disciplinary") || d.includes("management")) {
+          return "bg-gradient-to-r from-amber-500/30 to-orange-500/30 text-amber-300 border-amber-400/60 shadow-sm shadow-amber-500/20";
+        }
+        if (d.includes("rampwalk")) {
+          return "bg-gradient-to-r from-rose-500/30 to-pink-500/30 text-pink-300 border-pink-400/60 shadow-sm shadow-pink-500/20";
+        }
+        if (d.includes("art") || d.includes("craft")) {
+          return "bg-gradient-to-r from-emerald-500/30 to-teal-500/30 text-emerald-300 border-emerald-400/60 shadow-sm shadow-emerald-500/20";
+        }
+        if (d.includes("anchors")) {
+          return "bg-gradient-to-r from-cyan-500/30 to-blue-500/30 text-cyan-300 border-cyan-400/60 shadow-sm shadow-cyan-500/20";
+        }
+        if (d.includes("technical")) {
+          return "bg-gradient-to-r from-indigo-500/30 to-purple-500/30 text-indigo-300 border-indigo-400/60 shadow-sm shadow-indigo-500/20";
+        }
+        if (d.includes("sound")) {
+          return "bg-gradient-to-r from-fuchsia-500/30 to-violet-500/30 text-fuchsia-300 border-fuchsia-400/60 shadow-sm shadow-fuchsia-500/20";
+        }
+        if (d.includes("video") || d.includes("photo")) {
+          return "bg-gradient-to-r from-sky-500/30 to-blue-600/30 text-sky-300 border-sky-400/60 shadow-sm shadow-sky-500/20";
+        }
+        if (d.includes("fillers")) {
+          return "bg-gradient-to-r from-yellow-500/30 to-lime-500/30 text-yellow-300 border-yellow-400/60 shadow-sm shadow-yellow-500/20";
+        }
+        return "bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-200 border-purple-400/50";
+      };
+
       return (
         <div>
           {/* PRINT-ONLY VIEW: CLEAN PROFESSIONAL BLACK & WHITE */}
@@ -1101,119 +1638,222 @@
           </div>
 
           {/* WEB INTERFACE: HIGH-CONTRAST DARK THEME */}
-          <div className="noprint min-h-screen flex flex-col">
+          <div className="noprint min-h-screen flex flex-col relative overflow-x-hidden">
+            
+            {/* Interactive 3D WebGL Background Scene */}
+            <ThreeDBackground />
             
             {/* Toast Notification */}
             {toastMsg && (
-              <div className="fixed bottom-6 right-6 z-50 glass-card px-6 py-3.5 rounded-2xl border-2 border-purple-400 bg-purple-950/95 text-white shadow-2xl flex items-center gap-3 animate-bounce">
+              <div className="fixed bottom-6 right-6 z-50 glass-card px-6 py-3.5 rounded-2xl border-2 border-purple-400/80 bg-[#0e0720]/95 text-white shadow-[0_10px_35px_rgba(168,85,247,0.35)] flex items-center gap-3 transition-all duration-300">
                 <span className="text-2xl">✨</span>
                 <span className="text-sm font-bold tracking-wide">{toastMsg}</span>
               </div>
             )}
 
             {/* Navigation Bar */}
-            <header className="sticky top-0 z-40 glass-nav px-4 md:px-8 py-3.5 shadow-xl">
-              <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <header className="sticky top-0 z-40 glass-nav px-3 sm:px-6 py-2.5 sm:py-3.5 shadow-xl">
+              <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
                 
                 {/* Logo & Title */}
-                <div className="flex items-center gap-3 cursor-pointer select-none" onClick={() => setActiveTab("home")}>
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/40 border border-purple-300/40">
-                    🎉
+                <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none min-w-0" onClick={() => setActiveTab("home")}>
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-600/20 border border-purple-400/30 flex items-center justify-center text-lg sm:text-xl shadow-inner shrink-0">
+                    ✨
                   </div>
-                  <div>
-                    <div className="font-heading font-black text-2xl tracking-tight bg-gradient-to-r from-purple-300 via-pink-300 to-amber-200 bg-clip-text text-transparent">
-                      Freshers 2026
+                  <div className="min-w-0">
+                    <div className="font-heading font-black text-lg sm:text-xl tracking-tight text-white flex items-center gap-1.5 leading-tight">
+                      <span>Freshers</span>
+                      <span className="text-amber-300 font-extrabold text-xs px-1.5 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20">2026</span>
                     </div>
-                    <div className="text-[11px] font-extrabold uppercase tracking-widest text-purple-300 -mt-1">
-                      October 16 • 10:00 AM
+                    <div className="text-[10px] sm:text-[11px] font-semibold text-slate-400 tracking-wide truncate">
+                      Thursday, Oct 16 • 10:00 AM
                     </div>
                   </div>
                 </div>
 
-                {/* Nav Tabs */}
-                <nav className="hidden md:flex items-center gap-1.5 bg-black/40 p-1.5 rounded-2xl border border-purple-500/20">
+                {/* Desktop Nav Tabs */}
+                <nav className={(viewMode === "phone" ? "hidden" : "hidden md:flex") + " items-center gap-1 bg-white/[0.04] p-1 rounded-xl border border-white/10"}>
                   <button 
                     onClick={() => setActiveTab("home")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "home" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "home" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Overview
                   </button>
                   <button 
                     onClick={() => setActiveTab("schedule")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "schedule" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Itinerary & Acts
                   </button>
                   <button 
                     onClick={() => setActiveTab("members")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
-                    <span>👥</span> Committee Members
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 " + (activeTab === "members" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
+                    <span>👥</span> Committee
                   </button>
                   <button 
                     onClick={() => setActiveTab("team")} 
-                    className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all " + (activeTab === "team" ? "bg-purple-600 text-white shadow-md shadow-purple-600/50" : "text-gray-300 hover:text-white hover:bg-white/5")}>
+                    className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all " + (activeTab === "team" ? "bg-white text-gray-950 font-bold shadow-sm" : "text-slate-300 hover:text-white hover:bg-white/5")}>
                     Anchor Squad
                   </button>
                   {isSuperAdmin && (
                     <button 
                       onClick={() => setActiveTab("admin")} 
-                      className={"px-3.5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/40" : "text-amber-300 hover:bg-amber-500/15 border border-amber-500/30")}>
-                      <span>👑</span> Master Dashboard
+                      className={"px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 " + (activeTab === "admin" ? "bg-amber-400 text-gray-950 shadow-sm" : "text-amber-300 hover:bg-amber-400/10")}>
+                      <span>👑</span> Admin
                     </button>
                   )}
                 </nav>
 
-                {/* Auth & Edit Controls */}
-                <div className="flex items-center gap-3">
+                {/* Right Action Controls */}
+                <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                  {/* View Switcher: Auto / Phone / Desktop */}
+                  <div className="hidden lg:flex items-center bg-black/50 p-1 rounded-xl border border-purple-500/30 text-[11px] font-bold">
+                    <button
+                      onClick={() => setViewMode("auto")}
+                      className={"px-2 py-1 rounded-lg transition-all " + (viewMode === "auto" ? "bg-purple-600 text-white" : "text-gray-400 hover:text-white")}
+                      title="Responsive (Adapts to screen size)">
+                      Auto
+                    </button>
+                    <button
+                      onClick={() => setViewMode("phone")}
+                      className={"px-2 py-1 rounded-lg transition-all flex items-center gap-1 " + (viewMode === "phone" ? "bg-purple-600 text-white shadow" : "text-gray-400 hover:text-white")}
+                      title="Force Phone View layout">
+                      📱 Phone
+                    </button>
+                    <button
+                      onClick={() => setViewMode("desktop")}
+                      className={"px-2 py-1 rounded-lg transition-all flex items-center gap-1 " + (viewMode === "desktop" ? "bg-purple-600 text-white shadow" : "text-gray-400 hover:text-white")}
+                      title="Force Desktop View layout">
+                      💻 Desktop
+                    </button>
+                  </div>
+
                   {/* Cloud Sync Status Indicator */}
                   <div 
                     onClick={() => setCloudConfigModal(true)}
-                    className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass-card border border-purple-500/30 cursor-pointer hover:border-purple-400 transition-all text-[11px] font-bold"
+                    className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl glass-card border border-purple-500/30 cursor-pointer hover:border-purple-400 transition-all text-[10px] sm:text-xs font-bold"
                     title="Click to check or configure cross-device cloud sync">
-                    <span className={"w-2.5 h-2.5 rounded-full animate-pulse " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
-                    <span className="text-gray-200">
-                      {cloudStatus === "server" ? "Server API (Live)" : cloudStatus === "connected" ? "Firebase Cloud" : "Local Sync"}
+                    <span className={"w-2 h-2 rounded-full animate-pulse " + (cloudStatus === "connected" ? "bg-cyan-400" : cloudStatus === "server" ? "bg-emerald-400" : "bg-amber-400")}></span>
+                    <span className="hidden sm:inline text-gray-200">
+                      {cloudStatus === "connected" ? "Firebase" : cloudStatus === "server" ? "Server" : "Local"}
                     </span>
-                    {isSyncing && <span className="text-purple-300">🔄</span>}
                   </div>
 
                   {currentUser ? (
-                    <div className="flex items-center gap-3">
-                      <div className="hidden sm:block text-right">
-                        <div className="text-xs font-bold text-white max-w-[170px] truncate">{currentUser.name || currentUser.email}</div>
-                        <div className={"text-[10px] font-bold " + (isSuperAdmin ? "text-amber-300 font-mono" : currentUser.canEdit ? "text-emerald-300" : "text-purple-300")}>
-                          {isSuperAdmin ? "👑 Super Admin" : currentUser.canEdit ? "✏️ Editor Access" : "🎉 Attendee"}
-                        </div>
-                      </div>
-
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       {hasEditPermission && (
                         <button 
                           onClick={() => setEditMode(!editMode)} 
-                          className={"text-xs px-3.5 py-2 rounded-xl font-black border transition-all flex items-center gap-1.5 " + (editMode ? "bg-amber-400 text-black border-amber-300 shadow-lg shadow-amber-400/30 animate-pulse" : "bg-amber-500/20 border-amber-400 text-amber-200 hover:bg-amber-500/30")}>
-                          <span>✏️</span> {editMode ? "Exit Edit" : "Edit Mode"}
+                          className={"text-xs px-2.5 sm:px-3 py-1.5 rounded-xl font-bold border transition-all flex items-center gap-1 " + (editMode ? "bg-amber-400 text-black border-amber-300 shadow-md shadow-amber-400/30 animate-pulse" : "bg-amber-500/20 border-amber-400/60 text-amber-200 hover:bg-amber-500/30")}>
+                          <span>✏️</span>
+                          <span className="hidden sm:inline">{editMode ? "Exit Edit" : "Edit"}</span>
                         </button>
                       )}
 
+                      <div className="hidden xl:block text-right pr-1">
+                        <div className="text-xs font-bold text-white max-w-[130px] truncate">{currentUser.name || currentUser.email}</div>
+                        <div className={"text-[10px] font-bold " + (isSuperAdmin ? "text-amber-300 font-mono" : currentUser.canEdit ? "text-emerald-300" : "text-purple-300")}>
+                          {isSuperAdmin ? "👑 Admin" : currentUser.canEdit ? "✏️ Editor" : "🎉 Attendee"}
+                        </div>
+                      </div>
+
                       <button 
                         onClick={handleLogout} 
-                        className="text-xs px-3.5 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-500/40 text-red-200 font-bold transition-all">
-                        Logout
+                        className="text-xs px-2.5 sm:px-3 py-1.5 rounded-xl bg-red-950/60 hover:bg-red-900/80 border border-red-500/40 text-red-200 font-bold transition-all"
+                        title="Sign Out">
+                        <span className="hidden sm:inline">Logout</span>
+                        <span className="sm:hidden">🚪</span>
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button 
                         onClick={() => { setIsSignup(false); setAuthModalOpen(true); }}
-                        className="text-xs px-4 py-2 rounded-xl text-gray-200 hover:text-white font-bold glass-card hover:bg-white/10 transition-all border border-purple-500/30">
+                        className="text-xs px-2.5 sm:px-3 py-1.5 rounded-xl text-gray-200 hover:text-white font-bold glass-card hover:bg-white/10 transition-all border border-purple-500/30">
                         Log In
                       </button>
                       <button 
                         onClick={() => { setIsSignup(true); setAuthModalOpen(true); }}
-                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-lg shadow-purple-600/40 transition-all">
+                        className="text-xs px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-md shadow-purple-600/40 transition-all">
                         Sign Up
                       </button>
                     </div>
                   )}
+
+                  {/* Hamburger Menu Toggle Button (Mobile) */}
+                  <button 
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " p-2 rounded-xl glass-card border border-purple-500/40 text-purple-200 hover:text-white focus:outline-none"}
+                    aria-label="Toggle Navigation Menu">
+                    <span className="text-lg leading-none">{mobileMenuOpen ? "✕" : "☰"}</span>
+                  </button>
                 </div>
               </div>
+
+              {/* Mobile Collapsible Drawer Menu */}
+              {mobileMenuOpen && (
+                <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " pt-3 mt-2 border-t border-purple-500/30 space-y-2 animate-fadeIn"}>
+                  <div className="grid grid-cols-2 gap-1.5 text-xs font-bold">
+                    <button 
+                      onClick={() => { setActiveTab("home"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "home" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>🏠</span> Overview
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("schedule"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "schedule" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>📋</span> Itinerary & Acts
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("members"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "members" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>👥</span> Committee
+                    </button>
+                    <button 
+                      onClick={() => { setActiveTab("team"); setMobileMenuOpen(false); }} 
+                      className={"p-2.5 rounded-xl flex items-center gap-2 transition-all " + (activeTab === "team" ? "bg-purple-600 text-white font-black" : "glass-card text-gray-300")}>
+                      <span>🎤</span> Anchor Squad
+                    </button>
+                    {isSuperAdmin && (
+                      <button 
+                        onClick={() => { setActiveTab("admin"); setMobileMenuOpen(false); }} 
+                        className={"p-2.5 col-span-2 rounded-xl flex items-center justify-center gap-2 transition-all " + (activeTab === "admin" ? "bg-gradient-to-r from-red-600 to-amber-600 text-white font-black" : "glass-card text-amber-300 border border-amber-400/40")}>
+                        <span>👑</span> Master Admin Command Center
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Mode Toggle in Mobile Drawer */}
+                  <div className="p-2 rounded-xl bg-black/40 border border-purple-500/20 flex items-center justify-between text-xs">
+                    <span className="text-gray-400 font-semibold">View Mode:</span>
+                    <div className="flex gap-1 font-bold">
+                      <button 
+                        onClick={() => setViewMode("auto")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "auto" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        Auto
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("phone")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "phone" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        📱 Phone
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("desktop")} 
+                        className={"px-2.5 py-1 rounded-lg " + (viewMode === "desktop" ? "bg-purple-600 text-white" : "text-gray-400")}>
+                        💻 Desktop
+                      </button>
+                    </div>
+                  </div>
+
+                  {currentUser && (
+                    <div className="px-3 py-2 rounded-xl bg-purple-950/40 border border-purple-500/20 text-xs flex items-center justify-between">
+                      <div className="truncate">
+                        <span className="text-white font-bold block truncate">{currentUser.name || currentUser.email}</span>
+                        <span className="text-purple-300 text-[10px]">{isSuperAdmin ? "👑 Super Admin" : currentUser.canEdit ? "✏️ Editor Access" : "🎉 Attendee"}</span>
+                      </div>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30">Active</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </header>
 
             {/* Edit Mode Banner */}
@@ -1225,118 +1865,234 @@
             )}
 
             {/* Main Page View */}
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8 space-y-12">
+            <main className={"flex-1 mx-auto w-full px-3 sm:px-6 md:px-8 py-5 sm:py-8 space-y-8 sm:space-y-12 " + (viewMode === "phone" ? "max-w-md shadow-2xl border-x border-purple-500/20 bg-black/20" : "max-w-7xl")}>
 
               {/* TAB 1: OVERVIEW */}
               {activeTab === "home" && (
                 <div className="space-y-12">
                   
                   {/* Hero Section */}
-                  <section className="text-center py-10 px-4 relative space-y-6">
-                    <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-card border border-purple-400/40 text-purple-200 text-xs md:text-sm font-bold shadow-lg">
-                      <span className="text-amber-300">✨</span> Official Fresher's Extravaganza • Oct 16, 10:00 AM
+                  <section className="text-center py-8 sm:py-14 px-3 relative space-y-6">
+                    {/* Live Festival Soundwave Pill */}
+                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-amber-500/20 border border-purple-400/50 text-xs font-bold text-white shadow-[0_0_20px_rgba(236,72,153,0.25)]">
+                      <div className="flex items-center gap-1">
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                        <span className="eq-bar"></span>
+                      </div>
+                      <span className="uppercase tracking-widest text-[11px] text-amber-300 font-extrabold">The Biggest Welcome Festival</span>
+                      <span className="text-purple-300/60">•</span>
+                      <span className="text-white font-extrabold">October 16, 2026</span>
                     </div>
 
-                    <h1 className="font-heading text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-md">
-                      <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
-                    </h1>
+                    {/* Relative Title Wrapper with Live DJ Audio Soundwave Visualizer Effect */}
+                    <div className="relative py-8 sm:py-12 my-2 flex flex-col items-center justify-center">
+                      {/* Live DJ Equalizer Spectrum & Sonic Wave Pulse */}
+                      <DJSoundwaveVisualizer />
 
-                    <p className="text-lg sm:text-2xl text-purple-200 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-sm">
-                      <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
-                    </p>
+                      {/* Electric Concert Headline */}
+                      <h1 className="relative z-10 font-heading text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-[0.98] fest-title-gradient break-words max-w-5xl mx-auto select-none">
+                        <Ed v={data.title} on={editEnabled} ph="Event Title" label="Party Title" set={(val) => updateData(d => { d.title = val; return d; }, "Updated title")} />
+                      </h1>
 
-                    {/* Real-Time Countdown to Oct 16, 10:00 AM */}
-                    <div className="pt-4 grid grid-cols-4 gap-3 sm:gap-5 max-w-xl mx-auto">
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-purple-400/40 bg-purple-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-purple-200">{timeLeft.days}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-purple-300 mt-1">Days</div>
-                      </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-pink-400/40 bg-pink-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-pink-200">{timeLeft.hours}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-pink-300 mt-1">Hours</div>
-                      </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-indigo-400/40 bg-indigo-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-indigo-200">{timeLeft.mins}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-indigo-300 mt-1">Minutes</div>
-                      </div>
-                      <div className="glass-card p-4 sm:p-5 rounded-3xl text-center border border-amber-400/40 bg-amber-950/50 shadow-2xl">
-                        <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
-                        <div className="text-[11px] uppercase font-black tracking-widest text-amber-300 mt-1">Seconds</div>
-                      </div>
+                      <p className="relative z-10 text-base sm:text-2xl text-purple-100 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm px-2 mt-4">
+                        <Ed v={data.sub} on={editEnabled} ph="Event Subtitle" label="Party Subtitle" set={(val) => updateData(d => { d.sub = val; return d; }, "Updated subtitle")} />
+                      </p>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="pt-4 flex flex-wrap justify-center items-center gap-4">
+                    {/* Glowing Festival Countdown with 3D Tilt */}
+                    <TiltCard maxTilt={5} className="pt-2 max-w-2xl mx-auto w-full">
+                      <div className="relative p-1 rounded-3xl bg-gradient-to-r from-purple-500/40 via-pink-500/40 to-amber-500/40 shadow-[0_0_35px_rgba(168,85,247,0.3)]">
+                        <div className="bg-[#0e0720]/95 backdrop-blur-2xl rounded-[22px] p-4 sm:p-6 space-y-3">
+                          <div className="flex items-center justify-between text-[11px] sm:text-xs font-bold uppercase tracking-widest px-2">
+                            <span className="text-pink-400 flex items-center gap-1.5">
+                              <span className="animate-ping w-2 h-2 rounded-full bg-pink-400"></span>
+                              Stage Countdown
+                            </span>
+                            <span className="text-amber-300 font-extrabold flex items-center gap-1">
+                              <span>📍</span> Main Campus Auditorium
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-4 gap-2 sm:gap-4 text-center">
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-purple-400/40 bg-purple-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.days}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-purple-300 mt-1">Days</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-pink-400/40 bg-pink-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.hours}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-pink-300 mt-1">Hours</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-indigo-400/40 bg-indigo-950/40 shadow-lg">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-white">{timeLeft.mins}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-indigo-300 mt-1">Minutes</div>
+                            </div>
+                            <div className="glass-card py-3 sm:py-4 px-2 rounded-2xl border border-amber-400/50 bg-amber-950/40 shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                              <div className="font-heading text-3xl sm:text-5xl font-black text-amber-300">{timeLeft.secs}</div>
+                              <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-300 mt-1">Seconds</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TiltCard>
+
+                    {/* Celebration Action Buttons */}
+                    <div className="pt-2 flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 max-w-xl mx-auto">
                       <button 
                         onClick={triggerConfetti}
-                        className="px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-base shadow-2xl shadow-purple-600/50 transition-all transform hover:scale-105 flex items-center gap-2 border border-purple-300/30">
-                        <span>🎊</span> Celebrate & Cheer!
+                        className="px-8 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-sm sm:text-base shadow-[0_0_30px_rgba(236,72,153,0.45)] transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 border border-pink-300/40">
+                        <span className="text-xl">🎊</span>
+                        <span>Blast Confetti & Celebrate!</span>
                       </button>
                       <button 
                         onClick={() => setActiveTab("schedule")}
-                        className="px-6 py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-sm text-purple-100 border border-purple-400/30 transition-all">
-                        View Run of Show (41 Segments) →
+                        className="px-6 py-3.5 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-extrabold text-xs sm:text-sm text-purple-200 border border-purple-400/40 hover:border-purple-300 transition-all text-center">
+                        📋 Run of Show (41 Acts) →
                       </button>
                       <button 
                         onClick={() => setActiveTab("members")}
-                        className="px-6 py-4 rounded-2xl glass-card hover:bg-white/10 font-bold text-sm text-amber-300 border border-amber-400/30 transition-all">
-                        Department Committee (37 Members) →
+                        className="px-6 py-3.5 sm:py-4 rounded-2xl glass-card hover:bg-white/10 font-extrabold text-xs sm:text-sm text-amber-300 border border-amber-400/40 hover:border-amber-300 transition-all text-center">
+                        👑 Royal Spotlight →
                       </button>
                     </div>
                   </section>
 
-                  {/* Venue, Timing & Contact Cards */}
-                  <section className="grid md:grid-cols-3 gap-6">
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-purple-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-purple-500/25 border border-purple-400/40 flex items-center justify-center text-2xl">
-                        📍
-                      </div>
-                      <h3 className="font-heading text-xl font-black text-white">Auditorium & Venue</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
-                        <Ed v={data.venue} on={editEnabled} ph="Venue Details" label="Venue" set={(val) => updateData(d => { d.venue = val; return d; }, "Updated venue")} />
-                      </p>
+                  {/* 4 Big Party Experience Highlights with 3D Motion */}
+                  <section className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="font-heading text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                        <span>✨</span> What's In Store For You
+                      </h2>
+                      <span className="text-xs text-purple-300 font-bold uppercase tracking-wider">Party Lineup</span>
                     </div>
 
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-pink-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-pink-500/25 border border-pink-400/40 flex items-center justify-center text-2xl">
-                        🗓️
-                      </div>
-                      <h3 className="font-heading text-xl font-black text-white">Date & Timing</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
-                        <Ed v={data.when} on={editEnabled} ph="Date and Timing" label="Date/Time" set={(val) => updateData(d => { d.when = val; return d; }, "Updated timing")} />
-                      </p>
-                      {editEnabled && (
-                        <div className="pt-2 text-xs">
-                          <label className="text-amber-300 font-bold block mb-1">Update Target Date for Countdown:</label>
-                          <input 
-                            type="datetime-local" 
-                            value={data.targetDate || "2026-10-16T10:00"} 
-                            onChange={e => updateData(d => { d.targetDate = e.target.value; return d; }, "Updated target date")}
-                            className="w-full glass-card px-3 py-2 rounded-xl text-xs text-white border border-purple-400 focus:outline-none"
-                          />
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Highlight 1: DJ Night */}
+                      <TiltCard maxTilt={8} className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center text-2xl">
+                          🎧
                         </div>
-                      )}
-                    </div>
+                        <h3 className="font-heading font-black text-white text-base">Electric DJ Jam</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Non-stop EDM, Bollywood bangers & laser soundscape on the massive dance floor.
+                        </p>
+                      </TiltCard>
 
-                    <div className="glass-card p-7 rounded-3xl space-y-3 border border-indigo-500/30">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/25 border border-indigo-400/40 flex items-center justify-center text-2xl">
-                        📞
-                      </div>
-                      <h3 className="font-heading text-xl font-black text-white">Management & Contact</h3>
-                      <p className="text-sm text-gray-200 leading-relaxed font-medium">
-                        <Ed v={data.contact} on={editEnabled} ph="Contact info" label="Contact" set={(val) => updateData(d => { d.contact = val; return d; }, "Updated contact info")} />
-                      </p>
+                      {/* Highlight 2: Ramp Walk */}
+                      <TiltCard maxTilt={8} className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-2xl">
+                          👑
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">Runway & Crowning</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Mr. & Ms. Fresher ramp walk rounds, glamour walk & the official crown ceremony.
+                        </p>
+                      </TiltCard>
+
+                      {/* Highlight 3: 41 Live Acts */}
+                      <TiltCard maxTilt={8} className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-2xl">
+                          🎤
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">41 Curated Stage Acts</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Power-packed solo songs, acoustic jams, dramatic skits & energetic dance battles.
+                        </p>
+                      </TiltCard>
+
+                      {/* Highlight 4: Feast & Booths */}
+                      <TiltCard maxTilt={8} className="fest-feature-card p-5 space-y-2">
+                        <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-2xl">
+                          🍽️
+                        </div>
+                        <h3 className="font-heading font-black text-white text-base">Feast & Photo Booth</h3>
+                        <p className="text-xs text-purple-200/80 leading-relaxed font-medium">
+                          Multi-course festive dining, mocktail refreshments & instant photo memories.
+                        </p>
+                      </TiltCard>
                     </div>
                   </section>
 
+                  {/* Venue, Timing & Management Accent Cards */}
+                  <section className="grid md:grid-cols-3 gap-5">
+                    <TiltCard maxTilt={6}>
+                      <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-amber-400 h-full">
+                        <div className="flex items-center gap-2 text-amber-400">
+                          <span className="text-xl">📍</span>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300">Auditorium & Venue</span>
+                        </div>
+                        <h3 className="font-heading text-lg font-black text-white">Event Location</h3>
+                        <p className="text-sm text-purple-100 leading-relaxed font-medium">
+                          <Ed v={data.venue} on={editEnabled} ph="Venue Details" label="Venue" set={(val) => updateData(d => { d.venue = val; return d; }, "Updated venue")} />
+                        </p>
+                      </div>
+                    </TiltCard>
+
+                    <TiltCard maxTilt={6}>
+                      <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-pink-400 h-full">
+                        <div className="flex items-center gap-2 text-pink-400">
+                          <span className="text-xl">🗓️</span>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-pink-300">Date & Schedule</span>
+                        </div>
+                        <h3 className="font-heading text-lg font-black text-white">Day & Reporting</h3>
+                        <p className="text-sm text-purple-100 leading-relaxed font-medium">
+                          <Ed v={data.when} on={editEnabled} ph="Date and Timing" label="Date/Time" set={(val) => updateData(d => { d.when = val; return d; }, "Updated timing")} />
+                        </p>
+                        {editEnabled && (
+                          <div className="pt-2 text-xs">
+                            <label className="text-amber-300 font-bold block mb-1">Target Date for Countdown:</label>
+                            <input 
+                              type="datetime-local" 
+                              value={data.targetDate || "2026-10-16T10:00"} 
+                              onChange={e => updateData(d => { d.targetDate = e.target.value; return d; }, "Updated target date")}
+                              className="w-full glass-card px-3 py-2 rounded-xl text-xs text-white border border-purple-400 focus:outline-none"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </TiltCard>
+
+                    <TiltCard maxTilt={6}>
+                      <div className="fest-feature-card p-6 space-y-2.5 border-l-4 border-l-emerald-400 h-full">
+                        <div className="flex items-center gap-2 text-emerald-400">
+                          <span className="text-xl">📞</span>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Management Desk</span>
+                        </div>
+                        <h3 className="font-heading text-lg font-black text-white">Coordination & Inquiries</h3>
+                        <p className="text-sm text-purple-100 leading-relaxed font-medium">
+                          <Ed v={data.contact} on={editEnabled} ph="Contact info" label="Contact" set={(val) => updateData(d => { d.contact = val; return d; }, "Updated contact info")} />
+                        </p>
+                      </div>
+                    </TiltCard>
+                  </section>
+
                   {/* About the Celebration */}
-                  <section className="glass-card p-8 rounded-3xl border border-purple-500/30 space-y-4">
-                    <h2 className="font-heading text-2xl font-black text-white flex items-center gap-2">
-                      <span className="text-amber-300">✨</span> About Freshers 2026
+                  <section className="glass-card p-6 sm:p-8 rounded-3xl border border-purple-400/30 space-y-3 relative overflow-hidden bg-gradient-to-r from-purple-950/40 via-pink-950/20 to-indigo-950/40 shadow-xl">
+                    <div className="flex items-center gap-2 text-amber-300 text-xs uppercase font-extrabold tracking-widest">
+                      <span>🎉</span> The Fresher's Experience
+                    </div>
+                    <h2 className="font-heading text-xl sm:text-2xl font-black text-white">
+                      Welcome to the Next Chapter
                     </h2>
-                    <p className="text-gray-200 text-base leading-relaxed font-normal">
+                    <p className="text-purple-100 text-sm sm:text-base leading-relaxed font-normal max-w-4xl">
                       <Ed v={data.about} on={editEnabled} ph="About description" label="About details" set={(val) => updateData(d => { d.about = val; return d; }, "Updated about info")} />
                     </p>
+                    <div className="pt-3 flex flex-wrap items-center gap-4 text-xs font-extrabold text-purple-200 border-t border-purple-500/20">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-amber-300">✦</span> 41 Curated Stage Acts
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-pink-300">✦</span> 38 Organizing Members
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-emerald-300">✦</span> 8 Specialized Teams
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-yellow-300">✦</span> Runway & DJ Finale
+                      </div>
+                    </div>
                   </section>
                 </div>
               )}
@@ -1387,11 +2143,11 @@
                   </div>
 
                   {/* Category Filter Pills */}
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-bold">
-                    <span className="text-gray-400 mr-1 shrink-0">Filter:</span>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-semibold">
+                    <span className="text-slate-400 mr-1 shrink-0 text-[11px] font-bold uppercase tracking-wider">Filter:</span>
                     <button 
                       onClick={() => setSelectedCategoryFilter("all")}
-                      className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedCategoryFilter === "all" ? "bg-purple-600 text-white shadow-md shadow-purple-600/40" : "glass-card text-gray-300 hover:text-white")}>
+                      className={"px-3.5 py-1.5 rounded-xl transition-all shrink-0 text-xs font-bold " + (selectedCategoryFilter === "all" ? "bg-white text-gray-950 shadow-md shadow-white/10" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                       All Segments ({data.rows.length})
                     </button>
                     {ROW_CATEGORIES.map(cat => {
@@ -1401,70 +2157,84 @@
                         <button 
                           key={cat.id}
                           onClick={() => setSelectedCategoryFilter(cat.id)}
-                          className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 " + (selectedCategoryFilter === cat.id ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                          className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 text-xs font-semibold " + (selectedCategoryFilter === cat.id ? "bg-purple-600 text-white shadow-md shadow-purple-600/30" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                           <span>{cat.label}</span>
-                          <span className="opacity-70 text-[10px]">({count})</span>
+                          <span className="opacity-70 text-[10px] font-mono">({count})</span>
                         </button>
                       );
                     })}
                   </div>
 
                   {/* Schedule List */}
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {filteredScheduleRows.map((row) => {
                       const idx = row.originalIndex;
                       const badgeClass = getCategoryBadge(row.type);
                       const isSlot = row.type === "slot";
                       const isDJ = row.type === "dj";
+                      const isRamp = row.type === "ramp";
+                      const isFinale = row.type === "fin";
 
                       return (
-                        <div key={idx} className={"glass-card p-3.5 sm:p-4 rounded-2xl border-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:border-purple-400/60 " + (isDJ ? "bg-purple-950/70 border-pink-400 shadow-xl" : isSlot ? "border-dashed border-emerald-500/30 bg-emerald-950/10" : "border-purple-500/25")}>
+                        <div 
+                          key={idx} 
+                          className={"p-3.5 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all " + 
+                            (isDJ ? "sched-row-dj" : 
+                             isSlot ? "sched-row-slot" : 
+                             isRamp ? "sched-row border-l-4 border-l-amber-400" :
+                             isFinale ? "sched-row border-l-4 border-l-yellow-400" :
+                             "sched-row")}>
                           
                           {/* Left: Index + Type Badge + Title & Performers */}
-                          <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
-                            <span className="w-8 h-8 shrink-0 rounded-xl bg-purple-900/60 text-purple-200 font-heading font-black text-xs flex items-center justify-center border border-purple-400/50 shadow-inner">
+                          <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                            <span className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-lg bg-white/[0.06] text-slate-300 font-mono font-bold text-xs flex items-center justify-center border border-white/10">
                               {idx + 1}
                             </span>
 
                             <div className="flex-1 min-w-0 space-y-0.5">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className={"text-[9px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md border " + badgeClass}>
+                                <span className={"text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border " + badgeClass}>
                                   {TYPES_MAP[row.type] || row.type}
                                 </span>
-                                <div className={"font-heading font-extrabold text-sm sm:text-base " + (isSlot ? "text-emerald-300 italic" : "text-white")}>
+                                {isDJ && (
+                                  <span className="text-[9px] uppercase font-extrabold tracking-widest px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                                    ★ Grand Finale
+                                  </span>
+                                )}
+                                <div className={"font-heading font-bold text-sm sm:text-base " + (isSlot ? "text-emerald-300 italic" : "text-white")}>
                                   <Ed v={row.title} on={editEnabled} ph="Act / Item title" label="Row title" set={(val) => updateData(d => { d.rows[idx].title = val; return d; }, "Updated row title")} />
                                 </div>
                               </div>
-                              <div className="text-xs text-gray-300 font-medium">
-                                <span className="text-purple-300 font-semibold">Performers / Team: </span>
+                              <div className="text-xs text-slate-300/90 font-normal flex flex-wrap items-baseline gap-1.5">
+                                <span className="text-slate-400 text-[11px] font-medium">By:</span>
                                 <Ed v={row.who} on={editEnabled} ph="Performers or team names" label="Performers" set={(val) => updateData(d => { d.rows[idx].who = val; return d; }, "Updated performers")} />
                               </div>
                             </div>
                           </div>
 
                           {/* Right: Duration + Editor Controls */}
-                          <div className="flex items-center gap-2 sm:gap-3 self-end sm:self-center">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end pt-1 sm:pt-0 border-t sm:border-t-0 border-white/10">
                             {showDurations && (row.min || editEnabled) && (
-                              <span className="text-xs px-2.5 py-1 rounded-xl glass-card border border-purple-400/40 text-purple-200 font-bold whitespace-nowrap shadow-sm">
-                                <Ed v={row.min} on={editEnabled} ph="Duration" label="Duration" set={(val) => updateData(d => { d.rows[idx].min = val; return d; }, "Updated duration")} />
+                              <span className="text-[11px] px-2.5 py-1 rounded-lg bg-white/[0.05] border border-white/10 text-slate-300 font-semibold whitespace-nowrap">
+                                ⏱ <Ed v={row.min} on={editEnabled} ph="Duration" label="Duration" set={(val) => updateData(d => { d.rows[idx].min = val; return d; }, "Updated duration")} />
                               </span>
                             )}
 
                             {editEnabled && (
-                              <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-purple-500/30">
+                              <div className="flex flex-wrap items-center gap-1 bg-black/60 p-1 rounded-xl border border-purple-500/30">
                                 <select 
                                   value={row.type} 
                                   onChange={e => updateData(d => { d.rows[idx].type = e.target.value; return d; }, "Changed act category")}
-                                  className="glass-card text-[11px] text-purple-200 font-bold border border-purple-400/40 rounded-lg px-2 py-1 focus:outline-none"
+                                  className="glass-card text-[10px] sm:text-[11px] text-purple-200 font-bold border border-purple-400/40 rounded-lg px-1.5 py-0.5 focus:outline-none max-w-[110px]"
                                   title="Change Type">
                                   {ROW_CATEGORIES.map(c => <option key={c.id} value={c.id} className="bg-gray-950 text-white">{c.label}</option>)}
                                 </select>
-                                <button onClick={() => moveRow(idx, -1)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Up">↑</button>
-                                <button onClick={() => moveRow(idx, 1)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Down">↓</button>
-                                <button onClick={() => duplicateRow(idx)} className="p-1 rounded-lg glass-card hover:bg-white/10 text-xs text-emerald-300 font-bold" title="Duplicate Row">＋</button>
+                                <button onClick={() => moveRow(idx, -1)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Up">↑</button>
+                                <button onClick={() => moveRow(idx, 1)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-gray-200" title="Move Down">↓</button>
+                                <button onClick={() => duplicateRow(idx)} className="px-1.5 py-0.5 rounded-lg glass-card hover:bg-white/10 text-xs text-emerald-300 font-bold" title="Duplicate Row">＋</button>
                                 <button 
                                   onClick={() => removeRow(idx)} 
-                                  className="px-2 py-1 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all" 
+                                  className="px-1.5 py-0.5 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all" 
                                   title="Remove this Row">
                                   🗑️
                                 </button>
@@ -1527,21 +2297,72 @@
                     </div>
                   </div>
 
+                  {/* MR. & MS. FRESHERS 2025-26 ROYAL SPOTLIGHT */}
+                  <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-amber-400/50 bg-gradient-to-br from-amber-500/20 via-purple-950/40 to-black/80 backdrop-blur-xl shadow-[0_0_40px_rgba(245,158,11,0.25)]">
+                    <div className="absolute -top-20 -right-20 w-56 h-56 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute -bottom-20 -left-20 w-56 h-56 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="relative z-10 flex flex-col items-center text-center space-y-4">
+                      <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-black tracking-widest uppercase shadow-md">
+                        <span>👑</span> The Royal Court Spotlight <span>👑</span>
+                      </div>
+
+                      <div>
+                        <h3 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight gold-title-gradient">
+                          MR. &amp; MS. FRESHERS 2025–26
+                        </h3>
+                        <p className="text-xs sm:text-sm text-amber-200/90 mt-1 max-w-lg mx-auto font-medium">
+                          Leading the celebration with charisma, royalty, runway grace &amp; festive elegance
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl pt-2">
+                        {/* Devansh Pandey - Mr Fresher */}
+                        <TiltCard maxTilt={10}>
+                          <div className="glass-card p-4 sm:p-5 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-b from-amber-500/10 to-black/60 hover:border-amber-400/70 transition-all flex items-center gap-4 text-left shadow-lg h-full">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-2xl font-black text-gray-950 shadow-md shadow-amber-400/40 shrink-0">
+                              👑
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 block">MR. FRESHER</span>
+                              <h4 className="text-lg sm:text-xl font-black text-white truncate">Devansh Pandey</h4>
+                              <p className="text-xs text-amber-200/80 font-medium mt-0.5">Management Lead • Anchor</p>
+                            </div>
+                          </div>
+                        </TiltCard>
+
+                        {/* Riya Jain - Ms Fresher */}
+                        <TiltCard maxTilt={10}>
+                          <div className="glass-card p-4 sm:p-5 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-b from-amber-500/10 to-black/60 hover:border-amber-400/70 transition-all flex items-center gap-4 text-left shadow-lg h-full">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-300 to-amber-500 flex items-center justify-center text-2xl font-black text-gray-950 shadow-md shadow-amber-400/40 shrink-0">
+                              ✨
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 block">MS. FRESHER</span>
+                              <h4 className="text-lg sm:text-xl font-black text-white truncate">Riya Jain</h4>
+                              <p className="text-xs text-amber-200/80 font-medium mt-0.5">Choreography Lead • Anchor</p>
+                            </div>
+                          </div>
+                        </TiltCard>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Search and Department Filter Bar */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                     <input 
                       type="text" 
                       placeholder="Search members by name, roll no, role or department..." 
                       value={memberSearchQuery}
                       onInput={e => setMemberSearchQuery(e.target.value)}
-                      className="w-full sm:w-96 glass-card px-5 py-3 rounded-2xl text-sm border border-purple-400/40 text-white placeholder-gray-400 focus:outline-none focus:border-purple-300 font-medium"
+                      className="w-full sm:w-96 bg-white/[0.04] px-4 py-2.5 rounded-xl text-sm border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-purple-400 font-medium transition-all"
                     />
 
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-bold">
-                      <span className="text-gray-400 mr-1 shrink-0">Dept:</span>
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+                      <span className="text-slate-400 mr-1 shrink-0 text-[11px] font-bold uppercase tracking-wider">Dept:</span>
                       <button 
                         onClick={() => setSelectedDeptFilter("all")}
-                        className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedDeptFilter === "all" ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                        className={"px-3 py-1.5 rounded-xl transition-all shrink-0 " + (selectedDeptFilter === "all" ? "bg-white text-gray-950 font-bold shadow-sm" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                         All ({members.length})
                       </button>
                       {allDepartments.map((dept, dIdx) => {
@@ -1550,9 +2371,9 @@
                           <button 
                             key={dIdx}
                             onClick={() => setSelectedDeptFilter(dept)}
-                            className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1 " + (selectedDeptFilter === dept ? "bg-purple-600 text-white shadow-md" : "glass-card text-gray-300 hover:text-white")}>
+                            className={"px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 " + (selectedDeptFilter === dept ? "bg-purple-600 text-white shadow-md shadow-purple-600/30" : "bg-white/[0.05] text-slate-300 hover:text-white border border-white/10")}>
                             <span>{dept.replace(" Department", "")}</span>
-                            <span className="opacity-70 text-[10px]">({count})</span>
+                            <span className="opacity-70 text-[10px] font-mono">({count})</span>
                           </button>
                         );
                       })}
@@ -1582,7 +2403,54 @@
                             </span>
                           </div>
 
-                          <div className="overflow-x-auto">
+                          {/* Mobile Cards View (Visible on Phone/Small screens) */}
+                          <div className={(viewMode === "desktop" ? "hidden" : "block md:hidden") + " space-y-2.5"}>
+                            {deptMembers.map((m, mIdx) => {
+                              const isMissingRoll = m.rollNo === "NOT FOUND";
+                              return (
+                                <div key={m.id || mIdx} className="glass-card p-3 rounded-2xl border border-purple-500/20 space-y-2">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-6 h-6 rounded-lg bg-purple-900/60 text-purple-200 text-xs font-bold flex items-center justify-center border border-purple-400/40 shrink-0">
+                                        {mIdx + 1}
+                                      </span>
+                                      <span className="font-bold text-white text-base">
+                                        <Ed v={m.name} on={editEnabled} ph="Name" label="Member Name" set={(val) => editMemberField(m.id, "name", val)} />
+                                      </span>
+                                    </div>
+                                    {editEnabled && (
+                                      <button 
+                                        onClick={() => removeMember(m.id, m.name)}
+                                        className="p-1.5 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/40 text-xs text-red-200 font-bold transition-all"
+                                        title="Delete Member">
+                                        🗑️
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-purple-500/10 text-xs">
+                                    <span className={"px-2.5 py-0.5 rounded-lg text-[11px] font-bold border " + getLeadBadgeStyle(m.role, dept)}>
+                                      <Ed v={m.role} on={editEnabled} ph="Role" label="Member Role" set={(val) => editMemberField(m.id, "role", val)} />
+                                    </span>
+                                    <div>
+                                      {isMissingRoll ? (
+                                        <span className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/50 inline-flex items-center gap-1">
+                                          <span>⚠️</span>
+                                          <Ed v={m.rollNo} on={editEnabled} ph="Roll No" label="Roll Number" set={(val) => editMemberField(m.id, "rollNo", val)} />
+                                        </span>
+                                      ) : (
+                                        <span className="font-mono text-xs font-semibold text-gray-300">
+                                          <Ed v={m.rollNo} on={editEnabled} ph="Roll No" label="Roll Number" set={(val) => editMemberField(m.id, "rollNo", val)} />
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Desktop Table View */}
+                          <div className={(viewMode === "phone" ? "hidden" : "hidden md:block") + " overflow-x-auto"}>
                             <table className="w-full text-left text-sm">
                               <thead className="bg-purple-950/70 text-purple-200 text-xs uppercase border-b border-purple-500/20 font-heading tracking-wider">
                                 <tr>
@@ -1608,7 +2476,7 @@
                                       </td>
 
                                       <td className="py-3.5 px-4">
-                                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-500/20 text-purple-200 border border-purple-400/30">
+                                        <span className={"px-2.5 py-1 rounded-lg text-xs font-bold border transition-all inline-block " + getLeadBadgeStyle(m.role, dept)}>
                                           <Ed v={m.role} on={editEnabled} ph="Role" label="Member Role" set={(val) => editMemberField(m.id, "role", val)} />
                                         </span>
                                       </td>
@@ -1664,24 +2532,31 @@
               {/* TAB 4: ANCHOR TEAMS */}
               {activeTab === "team" && (
                 <div className="space-y-6">
-                  <div>
-                    <h2 className="font-heading text-3xl sm:text-4xl font-black text-white">Anchor & Organizing Squads</h2>
-                    <p className="text-sm text-purple-200 mt-1 font-medium">The official stage hosts, fillers, and ramp walk anchoring teams.</p>
+                  <div className="border-b border-white/10 pb-4">
+                    <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-white">Stage Anchors & Hosts</h2>
+                    <p className="text-sm text-slate-300 mt-1 font-normal">The official emcees, stage fillers, and ramp walk hosts leading the show.</p>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {data.anchors.map((team, idx) => (
-                      <div key={idx} className="glass-card p-6 sm:p-7 rounded-3xl border-2 border-purple-500/30 hover:border-purple-400 transition-all space-y-3 shadow-xl">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center font-heading font-black text-white text-xl shadow-md">
-                          {team.k.toUpperCase()}
+                      <TiltCard key={idx} maxTilt={8}>
+                        <div className="glass-card p-5 sm:p-6 rounded-2xl border border-white/10 hover:border-purple-400/40 transition-all space-y-3 shadow-lg bg-gradient-to-b from-white/[0.03] to-black/30 h-full">
+                          <div className="flex items-center justify-between">
+                            <div className="w-10 h-10 rounded-xl bg-purple-600/15 border border-purple-400/30 flex items-center justify-center text-lg">
+                              🎙️
+                            </div>
+                            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2 py-0.5 rounded bg-white/[0.04] border border-white/5">
+                              Squad #{idx + 1}
+                            </span>
+                          </div>
+                          <h3 className="font-heading font-bold text-lg text-white">
+                            <Ed v={team.title} on={editEnabled} ph="Team Title" label="Anchor title" set={(val) => updateData(d => { d.anchors[idx].title = val; return d; }, "Updated anchor team title")} />
+                          </h3>
+                          <p className="text-sm text-slate-300 font-medium leading-relaxed">
+                            <Ed v={team.names} on={editEnabled} ph="Anchor names" label="Anchor names" set={(val) => updateData(d => { d.anchors[idx].names = val; return d; }, "Updated anchor team names")} />
+                          </p>
                         </div>
-                        <h3 className="font-heading font-black text-xl text-white">
-                          <Ed v={team.title} on={editEnabled} ph="Team Title" label="Anchor title" set={(val) => updateData(d => { d.anchors[idx].title = val; return d; }, "Updated anchor team title")} />
-                        </h3>
-                        <p className="text-sm text-purple-200 font-semibold leading-relaxed">
-                          <Ed v={team.names} on={editEnabled} ph="Anchor names" label="Anchor names" set={(val) => updateData(d => { d.anchors[idx].names = val; return d; }, "Updated anchor team names")} />
-                        </p>
-                      </div>
+                      </TiltCard>
                     ))}
                   </div>
                 </div>
@@ -1690,75 +2565,75 @@
               {/* TAB 5: SUPER ADMIN DASHBOARD */}
               {activeTab === "admin" && isSuperAdmin && (
                 <div className="space-y-8">
-                  <div className="border-b border-purple-500/20 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="border-b border-white/10 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-2">
-                      <div className="inline-block px-4 py-1.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/40 text-xs font-black uppercase tracking-wider">
-                        👑 Devansh Pandey's Master Command Center
+                      <div className="inline-block px-3.5 py-1 rounded-full bg-red-500/15 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider">
+                        👑 Admin Command Center
                       </div>
-                      <h2 className="font-heading text-4xl sm:text-5xl font-black text-white">Multi-Device User Registry</h2>
-                      <p className="text-sm text-purple-200 max-w-2xl font-medium">
-                        Live dashboard of every student registered from any device (phones, laptops, tablets). Control editor permissions in 1 click.
+                      <h2 className="font-heading text-3xl sm:text-4xl font-extrabold text-white">Attendee & Permissions Registry</h2>
+                      <p className="text-sm text-slate-300 max-w-2xl font-normal">
+                        Real-time directory of students accessing the portal across phones, laptops, and tablets. Toggle editing rights instantly.
                       </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
                       <button 
                         onClick={() => syncWithCloud(true)} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-purple-400/40 hover:border-purple-300 text-xs font-bold text-white flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl glass-card border border-white/10 hover:border-white/20 text-xs font-bold text-white flex items-center gap-1.5 transition-all">
                         <span>🔄</span> {isSyncing ? "Syncing..." : "Sync Now"}
                       </button>
                       <button 
                         onClick={() => setCloudConfigModal(true)} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-cyan-400/40 text-cyan-200 hover:bg-cyan-950/40 text-xs font-bold flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl glass-card border border-cyan-400/30 text-cyan-200 hover:bg-cyan-950/40 text-xs font-bold flex items-center gap-1.5 transition-all">
                         <span>⚙️</span> Cloud Setup
                       </button>
                       <button 
                         onClick={copyAllEmails} 
-                        className="px-4 py-2.5 rounded-xl glass-card border border-pink-400/40 text-pink-200 hover:bg-pink-950/40 text-xs font-bold flex items-center gap-2 transition-all">
-                        <span>📋</span> Copy All Emails
+                        className="px-4 py-2 rounded-xl glass-card border border-pink-400/30 text-pink-200 hover:bg-pink-950/40 text-xs font-bold flex items-center gap-1.5 transition-all">
+                        <span>📋</span> Copy Emails
                       </button>
                       <button 
                         onClick={exportAttendeesCSV} 
-                        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all">
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
                         <span>📥</span> Export CSV
                       </button>
                     </div>
                   </div>
 
                   {/* Cloud Connection Live Banner */}
-                  <div className={"p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 text-xs font-bold " + (cloudStatus === "server" ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : cloudStatus === "connected" ? "bg-cyan-950/40 border-cyan-500/40 text-cyan-200" : "bg-purple-950/40 border-purple-500/40 text-purple-200")}>
+                  <div className={"p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 text-xs font-medium " + (cloudStatus === "server" ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-200" : cloudStatus === "connected" ? "bg-cyan-950/30 border-cyan-500/30 text-cyan-200" : "bg-purple-950/30 border-purple-500/30 text-purple-200")}>
                     <div className="flex items-center gap-2.5">
-                      <span className={"w-3 h-3 rounded-full animate-ping " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
+                      <span className={"w-2.5 h-2.5 rounded-full animate-ping " + (cloudStatus === "server" ? "bg-emerald-400" : cloudStatus === "connected" ? "bg-cyan-400" : "bg-amber-400")}></span>
                       <span>
-                        <strong>Live Multi-Device Cloud Status:</strong> {cloudStatus === "server" ? "Node.js Server REST API Active & Connected" : cloudStatus === "connected" ? "Firebase Realtime Cloud Database Connected" : "Local Database Mode (Configure Firebase URL for serverless cross-device cloud sync)"}
+                        <strong className="font-bold text-white">Live Multi-Device Cloud:</strong> {cloudStatus === "server" ? "Connected via Node.js Server REST API" : cloudStatus === "connected" ? "Firebase Realtime Database Connected" : "Local Storage Mode"}
                       </span>
                     </div>
-                    <div className="text-gray-400">
+                    <div className="text-slate-400 text-[11px] font-mono">
                       Last Sync: {lastSyncTime ? lastSyncTime.toLocaleTimeString() : "Just now"}
                     </div>
                   </div>
 
                   {/* Statistics Overview */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="glass-card p-5 rounded-3xl border border-purple-400/40">
-                      <div className="text-xs text-purple-300 uppercase font-black">Total Registered</div>
-                      <div className="font-heading text-4xl font-black text-white mt-1">{users.length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Across all devices</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.02] to-transparent">
+                      <div className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Total Registered</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-white mt-1">{users.length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Cross-platform students</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-emerald-400/40">
-                      <div className="text-xs text-emerald-300 uppercase font-black">Active Editors</div>
-                      <div className="font-heading text-4xl font-black text-emerald-300 mt-1">{users.filter(u => u.canEdit).length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Granted edit permissions</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-emerald-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-emerald-400 uppercase font-bold tracking-wider">Active Editors</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-emerald-400 mt-1">{users.filter(u => u.canEdit).length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Authorized to edit live</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-pink-400/40">
-                      <div className="text-xs text-pink-300 uppercase font-black">Attendees</div>
-                      <div className="font-heading text-4xl font-black text-pink-300 mt-1">{users.filter(u => !u.canEdit).length}</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Students & Viewers</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-purple-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-purple-300 uppercase font-bold tracking-wider">Attendees</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-purple-200 mt-1">{users.filter(u => !u.canEdit).length}</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Live audience members</div>
                     </div>
-                    <div className="glass-card p-5 rounded-3xl border border-amber-400/40">
-                      <div className="text-xs text-amber-300 uppercase font-black">Super Admin</div>
-                      <div className="font-heading text-4xl font-black text-amber-300 mt-1">1</div>
-                      <div className="text-[11px] text-gray-400 mt-1">Devansh Pandey</div>
+                    <div className="glass-card p-4 sm:p-5 rounded-2xl border border-white/10 bg-gradient-to-b from-amber-500/[0.04] to-transparent">
+                      <div className="text-[11px] text-amber-300 uppercase font-bold tracking-wider">Super Admin</div>
+                      <div className="font-heading text-3xl sm:text-4xl font-black text-amber-300 mt-1">1</div>
+                      <div className="text-[11px] text-slate-500 mt-1">Devansh Pandey</div>
                     </div>
                   </div>
 
@@ -1776,9 +2651,79 @@
                     </div>
                   </div>
 
-                  {/* User Table */}
+                  {/* User Table / Mobile Cards */}
                   <div className="glass-card rounded-3xl overflow-hidden border-2 border-purple-500/30 shadow-2xl">
-                    <div className="overflow-x-auto">
+                    {/* Mobile Cards (Phone View) */}
+                    <div className={(viewMode === "desktop" ? "hidden" : "block md:hidden") + " divide-y divide-purple-500/20"}>
+                      {filteredUsers.map(u => {
+                        const isMaster = u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+                        const regDate = u.registeredAt ? new Date(u.registeredAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "System Default";
+
+                        return (
+                          <div key={u.id || u.email} className="p-4 space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <div className="font-bold text-white flex items-center gap-1.5">
+                                  <span>{u.name || u.email.split("@")[0]}</span>
+                                  {isMaster && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/50 font-black">SUPER ADMIN</span>}
+                                </div>
+                                <div className="text-xs text-purple-300 font-mono flex items-center gap-1.5 mt-0.5">
+                                  <span className="truncate max-w-[200px]">{u.email}</span>
+                                  <button 
+                                    onClick={() => { navigator.clipboard.writeText(u.email); notify(`Copied ${u.email}`); }}
+                                    className="text-[10px] text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-white/5"
+                                    title="Copy email">
+                                    📋
+                                  </button>
+                                </div>
+                              </div>
+                              <span className={"px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 " + (isMaster ? "bg-red-500/20 text-red-200 border border-red-400/50" : u.canEdit ? "bg-emerald-500/20 text-emerald-200 border border-emerald-400/50" : "bg-purple-500/20 text-purple-200")}>
+                                {isMaster ? "👑 Admin" : u.canEdit ? "✏️ Editor" : "🎉 Attendee"}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-gray-300 pt-1 border-t border-purple-500/10">
+                              <span className="px-2 py-0.5 rounded-md text-[11px] bg-gray-900/80 text-gray-300 border border-gray-700">
+                                {u.device || "Web Browser"}
+                              </span>
+                              <span className="text-[11px] text-gray-400">{regDate}</span>
+                            </div>
+
+                            {/* Editing Rights & Delete controls */}
+                            <div className="flex items-center justify-between gap-2 pt-1 border-t border-purple-500/10">
+                              <div>
+                                {isMaster ? (
+                                  <span className="text-xs text-amber-300 font-bold italic">Full Master Rights</span>
+                                ) : (
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                      type="checkbox" 
+                                      checked={!!u.canEdit}
+                                      onChange={e => toggleUserEditRights(u.email, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-10 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    <span className={"ml-2 text-xs font-bold " + (u.canEdit ? "text-emerald-300" : "text-gray-400")}>
+                                      {u.canEdit ? "Can Edit" : "Viewer"}
+                                    </span>
+                                  </label>
+                                )}
+                              </div>
+                              {!isMaster && (
+                                <button 
+                                  onClick={() => deleteUser(u.email)} 
+                                  className="text-xs text-red-300 hover:text-white px-2.5 py-1 rounded-xl border border-red-500/40 bg-red-950/40 hover:bg-red-900 transition-all font-bold">
+                                  Remove
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className={(viewMode === "phone" ? "hidden" : "hidden md:block") + " overflow-x-auto"}>
                       <table className="w-full text-left text-sm">
                         <thead className="bg-purple-950/80 text-purple-200 text-xs uppercase border-b border-purple-500/30 font-heading tracking-wider">
                           <tr>
@@ -1869,16 +2814,52 @@
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-purple-500/20 py-8 px-4 text-center text-xs text-purple-200 mt-auto bg-black/40">
-              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-medium">
+            <footer className="border-t border-white/10 py-8 pb-24 md:pb-8 px-4 text-center text-xs text-slate-400 mt-auto bg-black/30">
+              <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-normal">
                 <div>
                   © 2026 Freshers Welcome • October 16, 2026 • 10:00 AM
                 </div>
-                <div className="text-gray-300">
-                  Management Lead: <strong className="text-white">Devansh Pandey</strong>
+                <div className="text-slate-400">
+                  Management Lead: <strong className="text-white font-medium">Devansh Pandey</strong>
                 </div>
               </div>
             </footer>
+
+            {/* Mobile Bottom Navigation Bar (Dock) */}
+            <div className={(viewMode === "desktop" ? "hidden" : "md:hidden") + " fixed bottom-0 left-0 right-0 z-40 bg-[#090612]/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 flex items-center justify-around shadow-2xl"}>
+              <button 
+                onClick={() => setActiveTab("home")} 
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "home" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">🏠</span>
+                <span className="text-[10px] tracking-wide">Home</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("schedule")} 
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "schedule" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">📋</span>
+                <span className="text-[10px] tracking-wide">Itinerary</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("members")} 
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "members" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">👥</span>
+                <span className="text-[10px] tracking-wide">Committee</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("team")} 
+                className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "team" ? "text-white font-bold" : "text-slate-400 hover:text-slate-200")}>
+                <span className="text-base">🎤</span>
+                <span className="text-[10px] tracking-wide">Anchors</span>
+              </button>
+              {isSuperAdmin && (
+                <button 
+                  onClick={() => setActiveTab("admin")} 
+                  className={"flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all " + (activeTab === "admin" ? "text-amber-300 font-bold" : "text-amber-400/60 hover:text-amber-300")}>
+                  <span className="text-base">👑</span>
+                  <span className="text-[10px] tracking-wide">Admin</span>
+                </button>
+              )}
+            </div>
 
             {/* MODAL: CLOUD SYNC & DATABASE CONFIGURATION */}
             {cloudConfigModal && (

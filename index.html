@@ -661,10 +661,10 @@
     }, {});
 
     // Department List
-    // Department List
     const DEFAULT_DEPARTMENTS = [
       "Technical Department",
       "Video & Photography Department",
+      "Music Department",
       "Sound Department",
       "Disciplinary & Hospitality Department",
       "Anchors",
@@ -681,7 +681,7 @@
       { id: "m3", department: "Video & Photography Department", role: "Member", name: "Ayush Pal", rollNo: "2500460120007" },
       { id: "m4", department: "Video & Photography Department", role: "Member", name: "Parth Gupta", rollNo: "NOT FOUND" },
       { id: "m5", department: "Video & Photography Department", role: "Member", name: "Anand Kumar", rollNo: "2500461520024" },
-      { id: "m6", department: "Sound Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "NOT FOUND" },
+      { id: "m6", department: "Music Department", role: "Music composer", name: "Abhinav Tripathi(1st yr)", rollNo: "---1st Year---" },
       { id: "m0", department: "Disciplinary & Hospitality Department", role: "Management Lead", name: "Devansh Pandey", rollNo: "2500461520057" },
       { id: "m7", department: "Disciplinary & Hospitality Department", role: "Member", name: "Bhoomi Gupta", rollNo: "2500460100066" },
       { id: "m8", department: "Disciplinary & Hospitality Department", role: "Member", name: "Lavanya Verma", rollNo: "2500460100101" },
@@ -836,15 +836,16 @@
       // Data State
       const [data, setData] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_party_data_v9");
+          const saved = localStorage.getItem("fresher_party_data_v9") ||
+                        localStorage.getItem("fresher_party_data_v8") ||
+                        localStorage.getItem("fresher_party_data");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed.title === "Freshers 2026" || !parsed.title) {
               parsed.title = "Freshers 2026-27";
             }
-            if (parsed.anchors && (parsed.anchors.length > 4 || parsed.anchors.some(a => a.names && a.names.includes("Shivanand")))) {
+            if (parsed.anchors && parsed.anchors.length > 4) {
               parsed.anchors = DEFAULT_DATA.anchors;
-              parsed.rows = DEFAULT_DATA.rows;
             }
             return parsed;
           }
@@ -857,22 +858,12 @@
       // Committee Members State
       const [members, setMembers] = useState(() => {
         try {
-          const saved = localStorage.getItem("fresher_committee_members_v4");
+          const saved = localStorage.getItem("fresher_committee_members_v4") ||
+                        localStorage.getItem("fresher_committee_members_v3") ||
+                        localStorage.getItem("fresher_committee_members_v2") ||
+                        localStorage.getItem("fresher_committee_members");
           if (saved) {
             const list = JSON.parse(saved);
-            // Ensure Shivanand and Anvesha are NOT listed as Anchors anywhere
-            list.forEach(m => {
-              if (m.name && (m.name.includes("Shivanand") || m.name.includes("Anvesha"))) {
-                if (m.department === "Anchors") m.department = "Rampwalk";
-                if (m.role && m.role.toLowerCase().includes("anchor")) m.role = "Member";
-              }
-            });
-            // Ensure Riya is Choreography Lead
-            const riya = list.find(m => m.name && m.name.toLowerCase().includes("riya jain"));
-            if (riya) {
-              riya.department = "Choreography";
-              riya.role = "Choreography Lead";
-            }
             return list;
           }
           return DEFAULT_MEMBERS;
@@ -1006,27 +997,12 @@
           if (!itin) return DEFAULT_DATA;
           const copy = JSON.parse(JSON.stringify(itin));
           if (!copy.title || copy.title === "Freshers 2026") copy.title = "Freshers 2026-27";
-          if (!copy.anchors || copy.anchors.length > 4 || copy.anchors.some(a => a.names && a.names.includes("Shivanand"))) {
-            copy.anchors = DEFAULT_DATA.anchors;
-            copy.rows = DEFAULT_DATA.rows;
-          }
           return copy;
         };
 
         const sanitizeMembers = (memList) => {
           if (!memList || !Array.isArray(memList)) return DEFAULT_MEMBERS;
-          const copy = JSON.parse(JSON.stringify(memList));
-          copy.forEach(m => {
-            if (m.name && (m.name.includes("Shivanand") || m.name.includes("Anvesha"))) {
-              if (m.department === "Anchors") m.department = "Rampwalk";
-              if (m.role && m.role.toLowerCase().includes("anchor")) m.role = "Member";
-            }
-            if (m.name && m.name.toLowerCase().includes("riya jain")) {
-              m.department = "Choreography";
-              m.role = "Choreography Lead";
-            }
-          });
-          return copy;
+          return memList;
         };
 
         // Tier 1: Firebase Realtime Database (Real-time global sync across all devices)
