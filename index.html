@@ -643,11 +643,11 @@
 
     const DEFAULT_FIREBASE_URL = "https://freshers-c9de2-default-rtdb.firebaseio.com";
 
-    // Official Festival Playlist (Plays on Overview Face)
+    // Official Festival Playlist (Continuous Back-to-Back Megamix on Overview Face)
     const DEFAULT_PLAYLIST = [
-      { id: 1, title: "Festival Intro Anthem", tag: "EDM Drop", file: "party-anthem.wav", duration: "0:36" },
-      { id: 2, title: "Club Groove Remix", tag: "Dance Beat", file: "party-anthem2.wav", duration: "0:36" },
-      { id: 3, title: "Bhangra Bass Mashup", tag: "High Energy", file: "party-anthem3.wav", duration: "1:19" }
+      { id: 1, title: "Festival Intro Anthem", tag: "EDM Drop", file: "party-anthem.wav", startTime: 0, duration: "0:36" },
+      { id: 2, title: "Club Groove Remix", tag: "Dance Beat", file: "party-anthem2.wav", startTime: 35.6, duration: "0:36" },
+      { id: 3, title: "Bhangra Bass Mashup", tag: "High Energy", file: "party-anthem3.wav", startTime: 71.9, duration: "1:19" }
     ];
 
     // Supported Performance / Row Categories
@@ -1255,7 +1255,7 @@
       }, [data.targetDate]);
 
       // =========================================================================
-      // PARTY PLAYLIST AUDIO ENGINE (Overview Face Playback)
+      // PARTY PLAYLIST AUDIO ENGINE (Seamless Back-to-Back Megamix on Overview)
       // =========================================================================
       const changeTrack = (newIndex, autoPlay = true) => {
         const audio = audioRef.current;
@@ -1263,8 +1263,7 @@
         const validIndex = (newIndex + DEFAULT_PLAYLIST.length) % DEFAULT_PLAYLIST.length;
         setCurrentTrackIndex(validIndex);
         currentTrackIndexRef.current = validIndex;
-        audio.src = DEFAULT_PLAYLIST[validIndex].file;
-        audio.load();
+        audio.currentTime = DEFAULT_PLAYLIST[validIndex].startTime;
         if (autoPlay && userWantsAudio && activeTab === "home") {
           audio.play().then(() => {
             setIsAudioPlaying(true);
@@ -1281,45 +1280,50 @@
       const prevTrack = (e) => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         const audio = audioRef.current;
-        if (audio && audio.currentTime > 3) {
-          audio.currentTime = 0;
+        if (!audio) return;
+        const curIdx = currentTrackIndexRef.current;
+        const curStart = DEFAULT_PLAYLIST[curIdx].startTime;
+        if (audio.currentTime > curStart + 3) {
+          audio.currentTime = curStart;
         } else {
-          changeTrack(currentTrackIndexRef.current - 1, true);
+          changeTrack(curIdx - 1, true);
         }
       };
 
       useEffect(() => {
-        const audio = new Audio(DEFAULT_PLAYLIST[0].file);
-        audio.loop = false; // We use auto-advance across the playlist
+        const audio = new Audio("party-megamix.wav");
+        audio.loop = true; // Loops the entire continuous back-to-back mix
         audio.volume = 0.45;
         audioRef.current = audio;
 
         const onPlay = () => setIsAudioPlaying(true);
         const onPause = () => setIsAudioPlaying(false);
-        const onEnded = () => {
-          // Continuous loop across playlist
-          const nextIdx = (currentTrackIndexRef.current + 1) % DEFAULT_PLAYLIST.length;
-          setCurrentTrackIndex(nextIdx);
-          currentTrackIndexRef.current = nextIdx;
-          audio.src = DEFAULT_PLAYLIST[nextIdx].file;
-          audio.load();
-          audio.play().then(() => {
-            setIsAudioPlaying(true);
-            notify(`🎵 Next Track: ${DEFAULT_PLAYLIST[nextIdx].title}`);
-          }).catch(() => {
-            setIsAudioPlaying(false);
-          });
+
+        // Keep active track synchronized as the megamix plays back-to-back
+        const onTimeUpdate = () => {
+          const t = audio.currentTime;
+          let idx = 0;
+          if (t >= 71.9) {
+            idx = 2;
+          } else if (t >= 35.6) {
+            idx = 1;
+          } else {
+            idx = 0;
+          }
+          if (idx !== currentTrackIndexRef.current) {
+            currentTrackIndexRef.current = idx;
+            setCurrentTrackIndex(idx);
+          }
         };
 
         audio.addEventListener("play", onPlay);
         audio.addEventListener("pause", onPause);
-        audio.addEventListener("ended", onEnded);
+        audio.addEventListener("timeupdate", onTimeUpdate);
 
         // Attempt initial autoplay if supported
         audio.play().then(() => {
           setIsAudioPlaying(true);
         }).catch(() => {
-          // Autoplay restricted until user interaction
           setIsAudioPlaying(false);
         });
 
@@ -1340,7 +1344,7 @@
           window.removeEventListener("keydown", onFirstInteraction);
           audio.removeEventListener("play", onPlay);
           audio.removeEventListener("pause", onPause);
-          audio.removeEventListener("ended", onEnded);
+          audio.removeEventListener("timeupdate", onTimeUpdate);
           audio.pause();
           audio.src = "";
         };
