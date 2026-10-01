@@ -963,6 +963,7 @@
 
       const isSuperAdmin = currentUser && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
       const hasEditPermission = isSuperAdmin || (currentUser && currentUser.canEdit);
+      const lastLocalEditTimeRef = useRef(0);
 
       const notify = (msg) => {
         setToastMsg(msg);
@@ -976,6 +977,10 @@
       // Sync State to Cloud / Server / Local
       const syncWithCloud = useCallback(async (forced = false) => {
         if (isSyncing && !forced) return;
+        // Prevent background polling from wiping local edits made within the last 10 seconds
+        if (!forced && Date.now() - lastLocalEditTimeRef.current < 10000) {
+          return;
+        }
         setIsSyncing(true);
 
         // Helper to update current active user session if permissions changed remotely
@@ -1002,7 +1007,31 @@
 
         const sanitizeMembers = (memList) => {
           if (!memList || !Array.isArray(memList)) return DEFAULT_MEMBERS;
-          return memList;
+          const list = memList.map(m => ({ ...m }));
+          
+          // Restore m18 to Anchors Squad A if it was corrupted to Choreography by old code
+          const m18 = list.find(m => m.id === "m18");
+          if (m18 && m18.department !== "Anchors") {
+            m18.department = "Anchors";
+            m18.role = "Anchor (Squad A)";
+          }
+
+          // Restore m29 to Choreography Lead
+          const m29 = list.find(m => m.id === "m29");
+          if (m29 && m29.department !== "Choreography") {
+            m29.department = "Choreography";
+            m29.role = "Choreography Lead";
+          }
+
+          // Deduplicate Choreography in case multiple entries for Riya Jain exist there
+          let seenChoreoRiya = false;
+          return list.filter(m => {
+            if (m.department === "Choreography" && m.name && m.name.toLowerCase().includes("riya jain")) {
+              if (seenChoreoRiya) return false;
+              seenChoreoRiya = true;
+            }
+            return true;
+          });
         };
 
         // Tier 1: Firebase Realtime Database (Real-time global sync across all devices)
@@ -1123,24 +1152,35 @@
       // Push all data state changes to cloud
       const pushStateToCloud = async (updatedData, updatedMembers, updatedUsers) => {
         const customUrl = firebaseUrl || localStorage.getItem("fresher_firebase_url") || DEFAULT_FIREBASE_URL;
+        let synced = false;
         if (customUrl) {
           try {
             const cleanUrl = customUrl.replace(/\/$/, "");
             if (updatedData) {
-              await fetch(`${cleanUrl}/portal_state/itinerary.json`, {
+              const res = await fetch(`${cleanUrl}/portal_state/itinerary.json`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedData)
               });
+              if (res.ok) synced = true;
             }
             if (updatedMembers) {
-              await fetch(`${cleanUrl}/portal_state/members.json`, {
+              const res = await fetch(`${cleanUrl}/portal_state/members.json`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedMembers)
               });
+              if (res.ok) synced = true;
             }
-          } catch (e) {}
+            await fetch(`${cleanUrl}/portal_state/lastUpdated.json`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(new Date().toISOString())
+            });
+            if (synced) setLastSyncTime(new Date());
+          } catch (e) {
+            console.warn("Failed pushing state to Firebase:", e);
+          }
         }
 
         // Try Server as well
@@ -1192,10 +1232,11 @@
 
       // Update Itinerary
       const updateData = (updater, logMsg) => {
+        lastLocalEditTimeRef.current = Date.now();
         setData(prev => {
           const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
           localStorage.setItem("fresher_party_data_v9", JSON.stringify(next));
-          pushStateToCloud(next, null, null);
+          setTimeout(() => pushStateToCloud(next, null, null), 0);
           return next;
         });
         if (logMsg) notify(logMsg);
@@ -1203,10 +1244,11 @@
 
       // Update Committee Members
       const updateMembers = (updater, logMsg) => {
+        lastLocalEditTimeRef.current = Date.now();
         setMembers(prev => {
           const next = typeof updater === "function" ? updater(JSON.parse(JSON.stringify(prev))) : updater;
           localStorage.setItem("fresher_committee_members_v4", JSON.stringify(next));
-          pushStateToCloud(null, next, null);
+          setTimeout(() => pushStateToCloud(null, next, null), 0);
           return next;
         });
         if (logMsg) notify(logMsg);
